@@ -1,3 +1,15 @@
+#' Transport average treatment effects under incomplete effect modification
+#'
+#' @param transport_Npsem
+#' @param learners
+#' @param family [\code{character(1)}]\cr
+#'  Outcome variable type (i.e., continuous, binomial).
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 transport_ate_incomplete <- function(transport_Npsem, learners, family, ...) {
     # P(S | V)
     fit_S <- regress(transport_Npsem$var("V"), transport_Npsem$var("S"), learners, "binomial", 10)
