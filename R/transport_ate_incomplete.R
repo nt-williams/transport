@@ -27,7 +27,7 @@ transport_ate_incomplete <- function(transport_Npsem, learners, family, ...) {
     pred_Y_1 <- regress_predict(fit_Y, transport_Npsem$modify("A", 1))
     pred_Y_0 <- regress_predict(fit_Y, transport_Npsem$modify("A", 0))
 
-    # E(E(Y| S=1, A = a, W) | S=1, V)
+    # E(E(Y| S=1, A=a, W) | S=1, V)
     fit_Pseudo_1 <- regress(transport_Npsem$data[, c(transport_Npsem$S, transport_Npsem$V)],
                             pred_Y_1, learners, "continuous", 10)
     pred_Pseudo_1 <- regress_predict(fit_Pseudo_1, transport_Npsem$modify("S", 1))
