@@ -45,8 +45,8 @@ transport_Npsem <- R6::R6Class(
             c(self$W, self$A, self$Z, self$S, self$Y)
         },
         modify = function(var, x) {
-            mod <- self$data
-            mod[[self[[var]]]] <- x
+            mod <- self$clone()
+            mod$data[[self[[var]]]] <- x
             mod
         }
     ),
