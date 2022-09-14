@@ -8,7 +8,7 @@ transport_Npsem <- R6::R6Class(
         Z = NULL,
         S = NULL,
         Y = NULL,
-        initialize = function(data, W, V = NULL, A, Z, S, Y) {
+        initialize = function(data, W, V = NULL, A = NULL, Z, S, Y) {
             checkmate::assertCharacter(W)
             checkmate::assertCharacter(V, null.ok = TRUE)
             checkmate::assertCharacter(Z, len = 1)
@@ -25,11 +25,14 @@ transport_Npsem <- R6::R6Class(
             self$Y <- Y
         },
         #' Return a data frame or vector of the variable
-        var = function(var = c("W", "V", "A", "Z", "S", "Y")) {
-            self$data[, self[[match.arg(var)]]]
+        var = function(var = c("W", "V", "A", "Z", "S", "Y"), data = FALSE) {
+            if (!data) {
+                return(self[[match.arg(var)]])
+            }
+            self$data[, self[[match.arg(var)]], drop = !(match.arg(var) == "V")]
         },
         #' Get all parent nodes for a variable
-        history = function(var = c("A", "Z", "Y", "S")) {
+        history = function(var = c("A", "Z", "Y", "S"), data = FALSE) {
             vars <- switch(
                 match.arg(var),
                 A = private$parents_A(),
@@ -38,6 +41,9 @@ transport_Npsem <- R6::R6Class(
                 Y = private$parents_Y()
             )
 
+            if (!data) {
+                return(vars)
+            }
             self$data[, vars, drop = match.arg(var) == "Y"]
         },
         #' Return the names of all variables

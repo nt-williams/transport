@@ -28,7 +28,31 @@ Np <- transport_Npsem$new(dat$obs, c("W1", "W2", "W3"),
 
 lr <- mlr3::lrn("classif.log_reg")
 lr$predict_type <- "prob"
-transport_ate_incomplete(Np, lr, "binomial", 1)
+transport_ate(Np, lr, "binomial", 1)
 
-test <- transport_ate(Np, c("SL.glm.interaction"), "binomial")
-mean(test$eif_1 - test$eif_0)
+rprt = lrn("classif.rpart", predict_type = "prob")
+lgb = lrn("classif.lightgbm", predict_type = "prob")
+lm = lrn("classif.log_reg", predict_type = "prob")
+
+# Define level 0
+level_0 =
+    gunion(list(
+        PipeOpLearnerCV$new(rprt, id = "rpart_l0",
+                            param_vals = list(resampling.folds = 10)),
+        PipeOpLearnerCV$new(lgb, id = "lightgbm_l0",
+                            param_vals = list(resampling.folds = 10)),
+        PipeOpLearnerCV$new(lm, id = "lm_l0",
+                            param_vals = list(resampling.folds = 10))
+    ))
+
+# Create "averager" learner (and set predict type to "prob")
+lrn_avg <- LearnerClassifAvg$new(id = "classif.avg")
+lrn_avg$predict_type <- "prob"
+
+# Combine level 0 and "averager" learner
+level_1  <- level_0 %>>%
+    PipeOpFeatureUnion$new(id = "u1") %>>%
+    lrn_avg
+
+lrn = GraphLearner$new(level_1)
+

@@ -1,38 +1,54 @@
-#' Title
-#'
-#' @param transport_Npsem
-#' @param learners
-#' @param family
-#' @param ...
-#'
-#' @return
-#' @export
-#'
-#' @examples
-transport_ate <- function(transport_Npsem, learners, family, ...) {
-    # P(S | W)
-    fit_S <- regress(transport_Npsem$var("W"), transport_Npsem$var("S"), learners, "binomial", 10)
-    pred_S <- regress_predict(fit_S, transport_Npsem$var("W"))
+transport_ate <- function(transport_Npsem, learner, family) {
+    # compute P(S | V)
+    fit_S <- train(transport_Npsem$var("W", data = TRUE),
+                   transport_Npsem$var("S", data = TRUE),
+                   "binomial",
+                   learner,
+                   10)
 
-    # P(Z | S, W)
-    fit_Z <- regress(transport_Npsem$history("Z"), transport_Npsem$var("Z"), learners, "binomial", 10)
-    pred_Z <- regress_predict(fit_Z, transport_Npsem$modify("S", 1)$history("Z"))
+    pred_S <- predict_from_fit(fit_S, transport_Npsem$var("W", data = TRUE))
 
-    # E(Y| S=1, Z, W)
-    fit_Y <- regress(transport_Npsem$history("Y")[transport_Npsem$var("S") == 1, ],
-                     transport_Npsem$var("Y")[transport_Npsem$var("S") == 1],
-                     learners, family, 10)
-    pred_Y_z <- regress_predict(fit_Y, transport_Npsem$history("Y"))
-    pred_Y_1 <- regress_predict(fit_Y, transport_Npsem$modify("Z", 1)$history("Y"))
-    pred_Y_0 <- regress_predict(fit_Y, transport_Npsem$modify("Z", 0)$history("Y"))
+    # compute P(Z | S, W)
+    fit_Z <- train(transport_Npsem$history("Z", data = TRUE),
+                   transport_Npsem$var("Z", data = TRUE),
+                   "binomial",
+                   learner,
+                   10)
 
-    # Influence function
-    z <- transport_Npsem$var("Z")
-    s <- transport_Npsem$var("S")
-    pred_Z_z <- z * pred_Z + (1 - z) * (1 - pred_Z)
-    ps0 <- mean(1 - transport_Npsem$var("S"))
-    y <- transport_Npsem$var("Y")
+    pred_Z <- predict_from_fit(fit_Z,
+                               transport_Npsem$modify("S", 1)$
+                                   history("Z", data = TRUE))
 
-    (((2*z - 1) * s) / pred_Z_z) * ((1 - pred_S) / (pred_S * ps0)) * (y - pred_Y_z) +
-        ((1 - s) / ps0) * (pred_Y_1 - pred_Y_0)
+    s <- transport_Npsem$var("S", data = TRUE)
+
+    # compute E(Y| S=1, Z, W)
+    fit_Y <- train(transport_Npsem$history("Y", data = TRUE)[s == 1, ],
+                   transport_Npsem$var("Y", data = TRUE)[s == 1],
+                   family,
+                   learner,
+                   10)
+
+    pred_Y_z <- predict_from_fit(fit_Y, transport_Npsem$
+                                     history("Y", data = TRUE))
+    pred_Y_1 <- predict_from_fit(fit_Y,
+                                 transport_Npsem$modify("Z", 1)$
+                                     history("Y", data = TRUE))
+    pred_Y_0 <- predict_from_fit(fit_Y,
+                                 transport_Npsem$modify("Z", 0)$
+                                     history("Y", data = TRUE))
+
+    lambda <- mean((pred_Y_1 - pred_Y_0)[s == 0])
+
+    a <- transport_Npsem$var("Z", data = TRUE)
+    y <- transport_Npsem$var("Y", data = TRUE)
+    pred_Z_z <- a * pred_Z + (1 - pred_Z) * (1 - a)
+
+    eic <- ifelse(s == 1,
+           (((2*a - 1) * s) / pred_Z_z) * ((1 - pred_S) / (pred_S * mean(s))) *
+               (y - pred_Y_z),
+           0) +
+        ((1 - pred_S) / mean(s)) * (pred_Y_1 - pred_Y_0 - lambda)
+
+    list(theta = lambda + mean(eic),
+         var = var(eic))
 }
