@@ -1,20 +1,20 @@
 train <- function(X, y, family, learners, folds) {
-    # family <- ifelse(family == "binomial", binomial(), gaussian())
-    # cv_control <- SuperLearner::SuperLearner.CV.control(V = 2)
-    # SuperLearner::SuperLearner(
-    #     y, X,
-    #     family = family[[1]],
-    #     SL.library = learners,
-    #     method = "method.NNLS",
-    #     env = environment(SuperLearner::SuperLearner),
-    #     cvControl = cv_control
-    # )
-    glmnet3(X, y, family)
+    family <- ifelse(family == "binomial", binomial(), gaussian())
+    cv_control <- SuperLearner::SuperLearner.CV.control(V = 2)
+    SuperLearner::SuperLearner(
+        y, X,
+        family = family[[1]],
+        SL.library = learners,
+        method = "method.NNLS",
+        env = environment(SuperLearner::SuperLearner),
+        cvControl = cv_control
+    )
+    # glmnet3(X, y, family)
 }
 
 predict_from_fit <- function(fit, newdata) {
-    # predict(fit, newdata)$pred[, 1]
-    predict.glmnet3(fit, newdata)
+    predict(fit, newdata)$pred[, 1]
+    # predict.glmnet3(fit, newdata)
 }
 
 glmnet3 <- function(X, y, family = c("gaussian", "binomial"), id = NULL) {
