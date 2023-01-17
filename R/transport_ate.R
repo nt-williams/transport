@@ -1,7 +1,7 @@
 transport_ate <- function(transport_Npsem, learner, family) {
     # compute P(S | V)
     fit_S <- train(transport_Npsem$var("W", data = TRUE),
-                   transport_Npsem$var("S", data = TRUE),
+                   transport_Npsem$var("S", data = TRUE, drop = TRUE),
                    "binomial",
                    learner,
                    10)
@@ -10,7 +10,7 @@ transport_ate <- function(transport_Npsem, learner, family) {
 
     # compute P(Z | S, W)
     fit_Z <- train(transport_Npsem$history("Z", data = TRUE),
-                   transport_Npsem$var("Z", data = TRUE),
+                   transport_Npsem$var("Z", data = TRUE, drop = TRUE),
                    "binomial",
                    learner,
                    10)
@@ -19,11 +19,11 @@ transport_ate <- function(transport_Npsem, learner, family) {
                                transport_Npsem$modify("S", 1)$
                                    history("Z", data = TRUE))
 
-    s <- transport_Npsem$var("S", data = TRUE)
+    s <- transport_Npsem$var("S", data = TRUE, drop = TRUE)
 
     # compute E(Y| S=1, Z, W)
     fit_Y <- train(transport_Npsem$history("Y", data = TRUE)[s == 1, ],
-                   transport_Npsem$var("Y", data = TRUE)[s == 1],
+                   transport_Npsem$var("Y", data = TRUE, drop = TRUE)[s == 1],
                    family,
                    learner,
                    10)
@@ -39,8 +39,8 @@ transport_ate <- function(transport_Npsem, learner, family) {
 
     lambda <- mean((pred_Y_1 - pred_Y_0)[s == 0])
 
-    a <- transport_Npsem$var("Z", data = TRUE)
-    y <- transport_Npsem$var("Y", data = TRUE)
+    a <- transport_Npsem$var("Z", data = TRUE, drop = TRUE)
+    y <- transport_Npsem$var("Y", data = TRUE, drop = TRUE)
     pred_Z_z <- a * pred_Z + (1 - pred_Z) * (1 - a)
 
     eic <- ifelse(s == 1,

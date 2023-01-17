@@ -25,11 +25,11 @@ transport_Npsem <- R6::R6Class(
             self$Y <- Y
         },
         #' Return a data frame or vector of the variable
-        var = function(var = c("W", "V", "A", "Z", "S", "Y"), data = FALSE) {
+        var = function(var = c("W", "V", "A", "Z", "S", "Y"), data = FALSE, drop = FALSE) {
             if (!data) {
                 return(self[[match.arg(var)]])
             }
-            self$data[, self[[match.arg(var)]], drop = !(match.arg(var) == "V")]
+            self$data[, self[[match.arg(var)]], drop = drop]
         },
         #' Get all parent nodes for a variable
         history = function(var = c("A", "Z", "Y", "S"), data = FALSE) {

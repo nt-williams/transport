@@ -1,16 +1,21 @@
 transport_ate_incomplete <- function(transport_Npsem, learner, family) {
+    v <- transport_Npsem$var("V", data = TRUE)
+    if (ncol(v) == 0) {
+        v <- data.frame(X = rep(1, nrow(transport_Npsem$data)))
+    }
+
     # compute P(S | V)
-    fit_S <- train(transport_Npsem$var("W", data = TRUE),
-                   transport_Npsem$var("S", data = TRUE),
+    fit_S <- train(v,
+                   transport_Npsem$var("S", data = TRUE, drop = TRUE),
                    "binomial",
                    learner,
                    10)
 
-    pred_S <- predict_from_fit(fit_S, transport_Npsem$var("W", data = TRUE))
+    pred_S <- predict_from_fit(fit_S, v)
 
     # compute P(Z | S, W)
     fit_Z <- train(transport_Npsem$history("Z", data = TRUE),
-                   transport_Npsem$var("Z", data = TRUE),
+                   transport_Npsem$var("Z", data = TRUE, drop = TRUE),
                    "binomial",
                    learner,
                    10)
@@ -19,11 +24,11 @@ transport_ate_incomplete <- function(transport_Npsem, learner, family) {
                                transport_Npsem$modify("S", 1)$
                                    history("Z", data = TRUE))
 
-    s <- transport_Npsem$var("S", data = TRUE)
+    s <- transport_Npsem$var("S", data = TRUE, drop = TRUE)
 
     # compute E(Y| S=1, Z, W)
     fit_Y <- train(transport_Npsem$history("Y", data = TRUE)[s == 1, ],
-                   transport_Npsem$var("Y", data = TRUE)[s == 1],
+                   transport_Npsem$var("Y", data = TRUE, drop = TRUE)[s == 1],
                    family,
                    learner,
                    10)
@@ -37,22 +42,21 @@ transport_ate_incomplete <- function(transport_Npsem, learner, family) {
                                  transport_Npsem$modify("Z", 0)$
                                      history("Y", data = TRUE))
 
-    a <- transport_Npsem$var("Z", data = TRUE)
-    y <- transport_Npsem$var("Y", data = TRUE)
+    a <- transport_Npsem$var("Z", data = TRUE, drop = TRUE)
+    y <- transport_Npsem$var("Y", data = TRUE, drop = TRUE)
     pred_Z_z <- a * pred_Z + (1 - pred_Z) * (1 - a)
 
     # construct T_(O, P)
     tmp_T_OP <- ((2*a - 1) / pred_Z_z) * (y - pred_Y_z) + pred_Y_1 - pred_Y_0
 
     # compute f(V)
-    fit_V <- train(transport_Npsem$var("V", data = TRUE)[s == 1, , drop = FALSE],
+    fit_V <- train(v[s == 1, , drop = FALSE],
                    tmp_T_OP[s == 1],
                    "gaussian",
                    learner,
                    10)
 
-    f_V <- predict_from_fit(fit_V, transport_Npsem$var("V", data = TRUE))
-    # f_V <- plogis(log(0.2) + log(1.66)*transport_Npsem$data$W1)
+    f_V <- predict_from_fit(fit_V, v)
 
     theta_init <- mean(f_V[s == 0])
 
