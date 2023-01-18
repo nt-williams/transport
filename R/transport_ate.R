@@ -1,5 +1,5 @@
 transport_ate <- function(transport_Npsem, learner, family) {
-    # compute P(S | V)
+    # compute P(S | W)
     fit_S <- train(transport_Npsem$var("W", data = TRUE),
                    transport_Npsem$var("S", data = TRUE, drop = TRUE),
                    "binomial",

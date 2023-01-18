@@ -1,9 +1,10 @@
-# Results in lambda variance slightly larger than theta variance with a 'sufficient' set and positive correlation
+# Results in lambda variance larger than theta variance with a 'sufficient' set and positive correlation
+# Trying to create positivity violations in P(S | W). Poor variance estimation with lambda.
 suppressPackageStartupMessages(library(tidyverse))
 
-gendata8 <- function(n, A = NULL) {
-    W1 <- rbinom(n, 1, 0.5)
-    W2 <- rbinom(n, 1, 0.75)
+gendata10 <- function(n, A = NULL) {
+    W1 <- rbinom(n, 1, 0.1)
+    W2 <- rbinom(n, 1, 0.5)
 
     if (is.null(A)) {
         A <- rbinom(n, 1, 0.5)
@@ -22,14 +23,14 @@ gendata8 <- function(n, A = NULL) {
                Yi = Yi)
 }
 
-truth <- mean(subset(gendata8(1e7, 1), S == 0)$Yi) -
-    mean(subset(gendata8(1e7, 0), S == 0)$Yi)
+truth <- mean(subset(gendata10(1e7, 1), S == 0)$Yi) -
+    mean(subset(gendata10(1e7, 0), S == 0)$Yi)
 
-mean(subset(gendata8(1e7, 1), S == 1)$Yi) -
-    mean(subset(gendata8(1e7, 0), S == 1)$Yi)
+mean(subset(gendata10(1e7, 1), S == 1)$Yi) -
+    mean(subset(gendata10(1e7, 0), S == 1)$Yi)
 
 res <- map(1:500, function(x) {
-    dat <- gendata8(1000)
+    dat <- gendata10(1000)
     out <- vector("list", 2)
     names(out) <- c("lambda", "theta")
 

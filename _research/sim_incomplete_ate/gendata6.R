@@ -1,4 +1,4 @@
-# Results in lambda variance larger than theta variance with a 'sufficient' set
+# Results in lambda variance larger than theta variance with a 'sufficient' set and negative correlation
 suppressPackageStartupMessages(library(tidyverse))
 
 gendata6 <- function(n, A = NULL) {
@@ -23,14 +23,14 @@ gendata6 <- function(n, A = NULL) {
                Yi = Yi)
 }
 
-mean(subset(gendata6(1e7, 1), S == 0)$Yi) -
+truth <- mean(subset(gendata6(1e7, 1), S == 0)$Yi) -
     mean(subset(gendata6(1e7, 0), S == 0)$Yi)
 
 mean(subset(gendata6(1e7, 1), S == 1)$Yi) -
     mean(subset(gendata6(1e7, 0), S == 1)$Yi)
 
 res <- map(1:500, function(x) {
-    dat <- gendata6(5000)
+    dat <- gendata6(1000)
     out <- vector("list", 2)
     names(out) <- c("lambda", "theta")
 
@@ -48,17 +48,17 @@ res <- map(1:500, function(x) {
 hist(map_dbl(res, \(x) x$lambda$theta))
 hist(map_dbl(res, \(x) x$theta$theta))
 
-var(map_dbl(res, \(x) x$lambda$theta)) * 5000
-var(map_dbl(res, \(x) x$theta$theta)) * 5000
+var(map_dbl(res, \(x) x$lambda$theta)) * 1000
+var(map_dbl(res, \(x) x$theta$theta)) * 1000
 
-median(map_dbl(res, \(x) x$lambda$var))
-median(map_dbl(res, \(x) x$theta$var))
+mean(map_dbl(res, \(x) x$lambda$var))
+mean(map_dbl(res, \(x) x$theta$var))
 
 covered <- function(x, n) {
     se <- sqrt(x$var) / sqrt(n)
     ci <- x$theta + c(-1, 1)*qnorm(0.975)*se
-    dplyr::between(1.01, ci[1], ci[2])
+    dplyr::between(truth, ci[1], ci[2])
 }
 
-mean(map_lgl(res, \(x) covered(x$lambda, n = 5000)))
-mean(map_lgl(res, \(x) covered(x$theta, n = 5000)))
+mean(map_lgl(res, \(x) covered(x$lambda, n = 1000)))
+mean(map_lgl(res, \(x) covered(x$theta, n = 1000)))
