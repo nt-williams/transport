@@ -2,15 +2,19 @@ suppressPackageStartupMessages(library(tidyverse))
 
 gendata <- function(n, A = NULL) {
     W1 <- rbinom(n, 1, 0.5)
+    W2 <- rbinom(n, 1, 0.5)
 
-    if (is.null(A)) A <- rbinom(n, 1, 0.5)
+    if (is.null(A)) {
+        A <- rbinom(n, 1, 0.5)
+    }
 
-    S <- rbinom(n, 1, 0.8 - 0.7*W1)
+    S <- rbinom(n, 1, 0.8 - 0.3*W1 - 0.48*W2)
 
-    Yi <- rnorm(n, A + W1, sqrt((0.1 + 0.8*W1)^2))
+    Yi <- rnorm(n, 1.2 + 0.25*A + 0.5*W1 + A*W1 + 0.5*W2)
     Y <- ifelse(S == 1, Yi, NA_real_)
 
     data.frame(W1 = W1,
+               W2 = W2,
                S = S,
                A = A,
                Y = Y,
@@ -30,11 +34,11 @@ safe_sim <- possibly(function(n) {
     out <- vector("list", 2)
     names(out) <- c("lambda", "theta")
 
-    Np <- transport_Npsem$new(dat, c("W1"), Z = "A", S = "S", Y = "Y")
-    lambda <- transport_ate(Np, c("SL.glm", "SL.mean"), "gaussian")
+    Np <- transport_Npsem$new(dat, c("W1", "W2"), Z = "A", S = "S", Y = "Y")
+    lambda <- transport_ate(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"), "gaussian")
 
-    Np <- transport_Npsem$new(dat, c("W1"), V = NULL, Z = "A", S = "S", Y = "Y")
-    theta <- transport_ate_incomplete(Np, c("SL.glm", "SL.mean"), "gaussian")
+    Np <- transport_Npsem$new(dat, c("W1", "W2"), V = "W1", Z = "A", S = "S", Y = "Y")
+    theta <- transport_ate_incomplete(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"), "gaussian")
 
     data.frame(estimator = c("lambda", "theta", "lambda_ipw", "theta_ipw"),
                order = 1:4,
@@ -60,4 +64,4 @@ out <- group_by(res, n, estimator, order) |>
 ref <- rep(filter(out, startsWith(estimator, "lambda"))$estimvar, each = 2)
 out <- mutate(out, releff = estimvar / ref)
 
-saveRDS(out, "_research/sim_incomplete_ate/results/dgp2.rds")
+saveRDS(out, "_research/sim_incomplete_ate/results/dgp3.rds")
