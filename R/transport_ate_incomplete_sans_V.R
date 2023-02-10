@@ -72,8 +72,6 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
                                 relax = TRUE, newx = scale(model.matrix(~ ., w)[, -1], T, F)[t, ])[, 1]
             f_W[v] <- predict(fit_V, s = "lambda.min", gamma = c(1),
                            relax = TRUE, newx = scale(model.matrix(~ ., w)[, -1], T, F)[v, ])[, 1]
-
-            # lambda <- (1 / (nrow(transport_Npsem$data[t, ]) * mean(s[t] == 0))) * sum(f_W[s[t] == 0])
         }
 
         if (method == "sl") V <- names(w)
@@ -89,7 +87,6 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
 
             f_Wt <- predict_from_fit(fit_V, w[t, V, drop = FALSE])
             f_W[v] <- predict_from_fit(fit_V, w[v, V, drop = FALSE])
-            # lambda <- (1 / (nrow(transport_Npsem$data[v, ]) * mean(s[v] == 0))) * sum(f_W[s[v] == 0])
         }
 
         if (var(f_Wt) == 0) {
@@ -100,89 +97,6 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
             hsW[v] <- predict(fit_hsW, as.matrix(f_W[v]))
         }
     }
-
-    # w <- transport_Npsem$var("W", data = TRUE)
-    # if (ncol(w) == 0) {
-    #     w <- data.frame(X = rep(1, nrow(transport_Npsem$data)))
-    # }
-    #
-    # # compute P(Z | S, W)
-    # fit_Z <- train(transport_Npsem$history("Z", data = TRUE),
-    #                transport_Npsem$var("Z", data = TRUE, drop = TRUE),
-    #                "binomial",
-    #                learner,
-    #                10)
-    #
-    # pred_Z <- predict_from_fit(fit_Z, transport_Npsem$modify("S", 1)$history("Z", data = TRUE))
-    #
-    # s <- transport_Npsem$var("S", data = TRUE, drop = TRUE)
-    #
-    # # compute E(Y| S=1, Z, W)
-    # fit_Y <- train(transport_Npsem$history("Y", data = TRUE)[s == 1, ],
-    #                transport_Npsem$var("Y", data = TRUE, drop = TRUE)[s == 1],
-    #                family,
-    #                learner,
-    #                10)
-    #
-    # pred_Y_z <- predict_from_fit(fit_Y, transport_Npsem$history("Y", data = TRUE))
-    # pred_Y_1 <- predict_from_fit(fit_Y, transport_Npsem$modify("Z", 1)$history("Y", data = TRUE))
-    # pred_Y_0 <- predict_from_fit(fit_Y, transport_Npsem$modify("Z", 0)$history("Y", data = TRUE))
-    #
-    # a <- transport_Npsem$var("Z", data = TRUE, drop = TRUE)
-    # y <- transport_Npsem$var("Y", data = TRUE, drop = TRUE)
-    # y[is.na(y)] <- -999
-    # pred_Z_z <- a * pred_Z + (1 - pred_Z) * (1 - a)
-    #
-    # # construct T_(O, P)
-    # tmp_T_OP <- ((2*a - 1) / pred_Z_z) * (y - pred_Y_z) + pred_Y_1 - pred_Y_0
-    #
-    # if (method %in% c("adaptive-lasso", "adaptive-lasso-sl")) {
-    #     penalty <- lm(tmp_T_OP ~ ., data = data.frame(tmp_T_OP = tmp_T_OP, w)[s == 1, ])
-    #     penalty <- 1 / abs(penalty$coefficients)
-    #
-    #     fit_V <- glmnet::cv.glmnet(
-    #         model.matrix(~ ., as.data.frame(scale(w, T, F)[s == 1, ]))[, -1],
-    #         as.matrix(tmp_T_OP[s == 1]),
-    #         family = "gaussian", penalty.factor = penalty[-1], nfolds = 20
-    #     )
-    #
-    #     v <- names(as.matrix(coef(fit_V, s = "lambda.min"))[which(as.matrix(coef(fit_V, s = "lambda.min")) != 0), ])[-1]
-    # }
-    #
-    # if (method == "adaptive-lasso") {
-    #     f_W <- predict(fit_V, s = "lambda.min", gamma = c(1),
-    #                    relax = TRUE, newx = scale(model.matrix(~ ., w)[, -1], T, F))[, 1]
-    #
-    #     lambda <- (1 / (nrow(transport_Npsem$data) * mean(s == 0))) * sum(f_W[s == 0])
-    #     # return(list(theta = lambda,
-    #     #             selected = v))
-    # }
-    #
-    # if (method == "sl") v <- names(w)
-    #
-    # if (is.null(v)) learner <- "SL.mean"
-    #
-    # if (method != "adaptive-lasso") {
-    #     fit_V <- train(w[s == 1, v, drop = FALSE],
-    #                    tmp_T_OP[s == 1],
-    #                    "gaussian",
-    #                    learner,
-    #                    10)
-    #
-    #     f_W <- predict_from_fit(fit_V, w[, v, drop = FALSE])
-    #     lambda <- (1 / (nrow(transport_Npsem$data) * mean(s == 0))) * sum(f_W[s == 0])
-    # }
-    #
-    # if (var(f_W) == 0) {
-    #     fit_hsW <- glm(s ~ f_W, family = "binomial", data = data.frame(s = s, f_W = f_W))
-    #     hsW <- predict(fit_hsW, type = "response")
-    # } else {
-    #     fit_hsW <- hal9001::fit_hal(as.matrix(f_W), s, family = "binomial")
-    #     hsW <- predict(fit_hsW, as.matrix(f_W))
-    # }
-
-    # fit_hsW <- glm(s ~ f_W, family = "binomial", data = data.frame(s = s, f_W = f_W))
-    # hsW <- predict(fit_hsW, type = "response")
 
     lambda <- (1 / (nrow(transport_Npsem$data) * mean(s == 0))) * sum(f_W[s == 0])
     hs <- (1 - hsW) / hsW
@@ -202,12 +116,10 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
     se <- sqrt(var) / sqrt(nrow(transport_Npsem$data))
     ci <- theta + c(-1, 1)*qnorm(0.975)*se
 
-    if (is.null(v)) v <- NA_character_
-
     list(theta = theta,
          var = var,
          confint = ci,
-         # selected = ifelse(match.arg(method) == "sl", NA_character_, v),
+         selected = ifelse(match.arg(method) == "sl" || folds > 1, NA_character_, V),
          ipw = as.numeric(coef(fit)[2]),
          ipw_var = summary(fit)$coefficients[2, 2]^2 * nrow(transport_Npsem$data),
          ipw_confint = as.numeric(confint(fit)[2, ]))
