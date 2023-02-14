@@ -93,8 +93,18 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
             fit_hsW <- glm(s ~ f_W, family = "binomial", data = data.frame(s = s[t], f_W = f_Wt))
             hsW[v] <- predict(fit_hsW, data.frame(f_W = f_W[v]), type = "response")
         } else {
-            fit_hsW <- hal9001::fit_hal(as.matrix(f_Wt), s[t], family = "binomial")
-            hsW[v] <- predict(fit_hsW, as.matrix(f_W[v]))
+            # fit_hsW <- hal9001::fit_hal(as.matrix(f_Wt), s[t], family = "binomial")
+            # hsW[v] <- predict(fit_hsW, as.matrix(f_W[v]))
+
+            # fit_hsW <- glm(s ~ f_W, family = "binomial", data = data.frame(s = s[t], f_W = f_Wt))
+            # hsW[v] <- predict(fit_hsW, data.frame(f_W = f_W[v]), type = "response")
+
+            fit_hsW <- train(data.frame(f_W = f_Wt),
+                             s[t],
+                             "binomial",
+                             learners,
+                             10)
+            hsW[v] <- predict_from_fit(fit_hsW, data.frame(f_W = f_W[v]))
         }
     }
 
