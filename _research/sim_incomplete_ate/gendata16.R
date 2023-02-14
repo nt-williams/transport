@@ -1,6 +1,9 @@
-suppressPackageStartupMessages(library(tidyverse))
-library(furrr)
-library(transport)
+suppressPackageStartupMessages({
+    library(glue)
+    library(transport)
+    library(tidyverse)
+    library(furrr)
+})
 
 gendata <- function(n, A = NULL) {
     W1 <- rbinom(n, 1, 0.5)
@@ -23,8 +26,7 @@ gendata <- function(n, A = NULL) {
                Yi = Yi)
 }
 
-truth <- mean(subset(gendata(1e7, 1), S == 0)$Yi) -
-    mean(subset(gendata(1e7, 0), S == 0)$Yi)
+truth <- mean(subset(gendata(1e7, 1), S == 0)$Yi) - mean(subset(gendata(1e7, 0), S == 0)$Yi)
 
 covered <- function(x) {
     c(dplyr::between(truth, x$confint[1], x$confint[2]),
@@ -33,6 +35,10 @@ covered <- function(x) {
 
 safe_sim <- possibly(function(n) {
     dat <- gendata(n)
+
+    folds <- case_when(n == 100 ~ 40,
+                       n == 1000 ~ 20,
+                       n == 1e4 ~ 10)
 
     Np <- transport_Npsem$new(dat, c("W1", "W2"), Z = "A", S = "S", Y = "Y")
     lambda <- transport_ate(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"), "gaussian")
@@ -44,8 +50,7 @@ safe_sim <- possibly(function(n) {
                order = 1:4,
                psi = c(lambda$theta, theta$theta, lambda$ipw, theta$ipw),
                var = c(lambda$var, theta$var, lambda$ipw_var, theta$ipw_var),
-               covered = c(covered(lambda)[1], covered(theta)[1],
-                           covered(lambda)[2],  covered(theta)[2]))
+               covered = c(covered(lambda)[1], covered(theta)[1], covered(lambda)[2],  covered(theta)[2]))
 }, NULL)
 
 plan(multisession)
@@ -56,6 +61,8 @@ res <- map_dfr(c(`100` = 100, `1000` = 1000, `1e4` = 1e4), function(n) {
     mutate(n = as.numeric(n))
 
 plan(sequential)
+
+res <- filter(res, abs(psi) < 10)
 
 out <- group_by(res, n, estimator, order) |>
     summarise(absbias = abs(mean(psi) - truth),
@@ -69,4 +76,4 @@ out <- group_by(res, n, estimator, order) |>
 ref <- rep(filter(out, startsWith(estimator, "lambda"))$estimvar, each = 2)
 out <- mutate(out, releff = estimvar / ref)
 
-saveRDS(out, "_research/sim_incomplete_ate/results/dgp5.rds")
+saveRDS(out, "_research/sim_incomplete_ate/results/dgp3-cf.rds")

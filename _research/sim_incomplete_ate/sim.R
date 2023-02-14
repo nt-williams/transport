@@ -5,7 +5,7 @@ suppressPackageStartupMessages({
 })
 
 dgp <- 4
-crossfit <- T
+crossfit <- F
 
 case_when(dgp == 1 ~ source("_research/sim_incomplete_ate/dgp1.R"),
           dgp == 2 ~ source("_research/sim_incomplete_ate/dgp2.R"),

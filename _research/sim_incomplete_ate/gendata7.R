@@ -1,4 +1,9 @@
-suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages({
+    library(glue)
+    library(transport)
+    library(tidyverse)
+    library(furrr)
+})
 
 gendata <- function(n, A = NULL) {
     W1 <- rbinom(n, 1, 0.5)
@@ -27,8 +32,10 @@ covered <- function(x) {
 
 safe_sim <- possibly(function(n) {
     dat <- gendata(n)
-    out <- vector("list", 2)
-    names(out) <- c("lambda", "theta")
+
+    folds <- case_when(n == 100 ~ 40,
+                       n == 1000 ~ 20,
+                       n == 1e4 ~ 10)
 
     Np <- transport_Npsem$new(dat, c("W1"), Z = "A", S = "S", Y = "Y")
     lambda <- transport_ate(Np, c("SL.glm", "SL.mean"), "gaussian")
@@ -43,10 +50,16 @@ safe_sim <- possibly(function(n) {
                covered = c(covered(lambda)[1], covered(theta)[1], covered(lambda)[2],  covered(theta)[2]))
 }, NULL)
 
-res <- map_dfr(c(`100` = 100, `500` = 500, `1000` = 1000, `1e4` = 1e4), function(n) {
-    map_dfr(1:500, function(i) safe_sim(n), .id = "i")
+plan(multisession)
+
+res <- map_dfr(c(`100` = 100, `1000` = 1000, `1e4` = 1e4), function(n) {
+    future_map_dfr(1:500, function(i) safe_sim(n), .id = "i")
 }, .id = "n") |>
     mutate(n = as.numeric(n))
+
+plan(sequential)
+
+res <- filter(res, abs(psi) < 10)
 
 out <- group_by(res, n, estimator, order) |>
     summarise(absbias = abs(mean(psi) - truth),
@@ -60,4 +73,4 @@ out <- group_by(res, n, estimator, order) |>
 ref <- rep(filter(out, startsWith(estimator, "lambda"))$estimvar, each = 2)
 out <- mutate(out, releff = estimvar / ref)
 
-saveRDS(out, "_research/sim_incomplete_ate/results/dgp2.rds")
+saveRDS(out, "_research/sim_incomplete_ate/results/dgp2-cf.rds")
