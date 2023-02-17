@@ -65,6 +65,18 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
             )
 
             V <- names(as.matrix(coef(fit_V, s = "lambda.min"))[which(as.matrix(coef(fit_V, s = "lambda.min")) != 0), ])[-1]
+
+            # penalty2 <- glm(S ~ ., data = data.frame(S = s, w[t, ])[t, ], family = "binomial")
+            # penalty2 <- 1 / abs(penalty2$coefficients)
+
+            fit_V2 <- glmnet::cv.glmnet(
+                model.matrix(~ ., as.data.frame(scale(w, T, F)[t, ]))[, -1],
+                as.matrix(s),
+                family = "binomial"#, penalty.factor = penalty2[-1], nfolds = 20
+            )
+
+            V2 <- names(as.matrix(coef(fit_V2, s = "lambda.min"))[which(as.matrix(coef(fit_V2, s = "lambda.min")) != 0), ])[-1]
+            V <- unique(c(V, V2))
         }
 
         if (method == "adaptive-lasso") {
@@ -74,11 +86,11 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
                            relax = TRUE, newx = scale(model.matrix(~ ., w)[, -1], T, F)[v, ])[, 1]
         }
 
-        if (method == "sl") V <- names(w)
-
-        if (is.null(V)) learner <- "SL.mean"
-
         if (method != "adaptive-lasso") {
+            if (method == "sl") V <- names(w)
+
+            if (is.null(V)) learner <- "SL.mean"
+
             if (is.null(V)) {
                 X <- data.frame(X1 = rep(1, nrow(w)))
             } else {
@@ -132,10 +144,14 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
     se <- sqrt(var) / sqrt(nrow(transport_Npsem$data))
     ci <- theta + c(-1, 1)*qnorm(0.975)*se
 
+    if (match.arg(method) == "sl" || folds > 1) {
+        V <- NA_character_
+    }
+
     list(theta = theta,
          var = var,
          confint = ci,
-         selected = ifelse(match.arg(method) == "sl" || folds > 1, NA_character_, V),
+         selected = V,
          ipw = as.numeric(coef(fit)[2]),
          ipw_var = summary(fit)$coefficients[2, 2]^2 * nrow(transport_Npsem$data),
          ipw_confint = as.numeric(confint(fit)[2, ]))
