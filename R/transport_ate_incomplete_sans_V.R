@@ -79,14 +79,20 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
         if (is.null(V)) learner <- "SL.mean"
 
         if (method != "adaptive-lasso") {
-            fit_V <- train(w[t, ][s[t] == 1, V, drop = FALSE],
+            if (is.null(V)) {
+                X <- data.frame(X1 = rep(1, nrow(w)))
+            } else {
+                X <- w[, V, drop = FALSE]
+            }
+
+            fit_V <- train(X[t, ][s[t] == 1, , drop = FALSE],
                            tmp_T_OP[s[t] == 1],
                            "gaussian",
                            learner,
                            10)
 
-            f_Wt <- predict_from_fit(fit_V, w[t, V, drop = FALSE])
-            f_W[v] <- predict_from_fit(fit_V, w[v, V, drop = FALSE])
+            f_Wt <- predict_from_fit(fit_V, X[t, , drop = FALSE])
+            f_W[v] <- predict_from_fit(fit_V, X[v, , drop = FALSE])
         }
 
         if (var(f_Wt) == 0) {
@@ -102,7 +108,7 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
             fit_hsW <- train(data.frame(f_W = f_Wt),
                              s[t],
                              "binomial",
-                             learners,
+                             learner,
                              10)
             hsW[v] <- predict_from_fit(fit_hsW, data.frame(f_W = f_W[v]))
         }
