@@ -66,17 +66,19 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
 
             V <- names(as.matrix(coef(fit_V, s = "lambda.min"))[which(as.matrix(coef(fit_V, s = "lambda.min")) != 0), ])[-1]
 
-            # penalty2 <- glm(S ~ ., data = data.frame(S = s, w[t, ])[t, ], family = "binomial")
-            # penalty2 <- 1 / abs(penalty2$coefficients)
+            if (method == "adaptive-lasso-sl") {
+                # penalty2 <- glm(S ~ ., data = data.frame(S = s, w[t, ])[t, ], family = "binomial")
+                # penalty2 <- 1 / abs(penalty2$coefficients)
 
-            fit_V2 <- glmnet::cv.glmnet(
-                model.matrix(~ ., as.data.frame(scale(w, T, F)[t, ]))[, -1],
-                as.matrix(s),
-                family = "binomial"#, penalty.factor = penalty2[-1], nfolds = 20
-            )
+                fit_V2 <- glmnet::cv.glmnet(
+                    model.matrix(~ ., as.data.frame(scale(w, T, F)[t, ]))[, -1],
+                    as.matrix(s),
+                    family = "binomial"#, penalty.factor = penalty2[-1], nfolds = 20
+                )
 
-            V2 <- names(as.matrix(coef(fit_V2, s = "lambda.min"))[which(as.matrix(coef(fit_V2, s = "lambda.min")) != 0), ])[-1]
-            V <- unique(c(V, V2))
+                V2 <- names(as.matrix(coef(fit_V2, s = "lambda.min"))[which(as.matrix(coef(fit_V2, s = "lambda.min")) != 0), ])[-1]
+                V <- V[V %in% V2]
+            }
         }
 
         if (method == "adaptive-lasso") {
@@ -97,7 +99,7 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
                 X <- w[, V, drop = FALSE]
             }
 
-            fit_V <- train(X[t, ][s[t] == 1, , drop = FALSE],
+            fit_V <- train(X[t, , drop = FALSE][s[t] == 1, , drop = FALSE],
                            tmp_T_OP[s[t] == 1],
                            "gaussian",
                            learner,
