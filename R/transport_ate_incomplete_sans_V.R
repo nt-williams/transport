@@ -85,7 +85,7 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
                 X <- w[, V, drop = FALSE]
             }
 
-            fit_V <- train(X[t, ][s[t] == 1, , drop = FALSE],
+            fit_V <- train(X[t, , drop = FALSE][s[t] == 1, , drop = FALSE],
                            tmp_T_OP[s[t] == 1],
                            "gaussian",
                            learner,
