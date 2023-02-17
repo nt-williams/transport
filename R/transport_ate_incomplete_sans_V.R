@@ -132,10 +132,14 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
     se <- sqrt(var) / sqrt(nrow(transport_Npsem$data))
     ci <- theta + c(-1, 1)*qnorm(0.975)*se
 
+    if (match.arg(method) == "sl" || folds > 1) {
+        V <- NA_character_
+    }
+
     list(theta = theta,
          var = var,
          confint = ci,
-         selected = ifelse(match.arg(method) == "sl" || folds > 1, NA_character_, V),
+         selected = V,
          ipw = as.numeric(coef(fit)[2]),
          ipw_var = summary(fit)$coefficients[2, 2]^2 * nrow(transport_Npsem$data),
          ipw_confint = as.numeric(confint(fit)[2, ]))
