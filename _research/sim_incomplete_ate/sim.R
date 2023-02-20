@@ -4,8 +4,8 @@ suppressPackageStartupMessages({
     library(tidyverse)
 })
 
-dgp <- 4
-crossfit <- F
+dgp <- 1
+crossfit <- T
 
 case_when(dgp == 1 ~ source("_research/sim_incomplete_ate/dgp1.R"),
           dgp == 2 ~ source("_research/sim_incomplete_ate/dgp2.R"),
@@ -31,15 +31,21 @@ sim <- possibly(function(n) {
         folds <- 1
     }
 
-    Np <- transport_Npsem$new(dat, c("W1", "W2"), Z = "A", S = "S", Y = "Y")
+    if (dgp %in% c(1, 2)) {
+        w <- c("W1")
+    } else {
+        w <- c("W1", "W2")
+    }
+
+    Np <- transport_Npsem$new(dat, w, Z = "A", S = "S", Y = "Y")
     gamma1 <- transport_ate_incomplete_sans_V(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"),
                                               "gaussian", "adaptive-lasso", folds)
 
-    Np <- transport_Npsem$new(dat, c("W1", "W2"), Z = "A", S = "S", Y = "Y")
+    Np <- transport_Npsem$new(dat, w, Z = "A", S = "S", Y = "Y")
     gamma2 <- transport_ate_incomplete_sans_V(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"),
                                               "gaussian", "adaptive-lasso-sl", folds)
 
-    Np <- transport_Npsem$new(dat, c("W1", "W2"), Z = "A", S = "S", Y = "Y")
+    Np <- transport_Npsem$new(dat, w, Z = "A", S = "S", Y = "Y")
     gamma3 <- transport_ate_incomplete_sans_V(Np, c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.ranger"),
                                               "gaussian", "sl", folds)
 

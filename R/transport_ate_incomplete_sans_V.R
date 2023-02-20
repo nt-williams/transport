@@ -58,20 +58,26 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
             penalty <- lm(tmp_T_OP ~ ., data = data.frame(tmp_T_OP = tmp_T_OP, w[t, ])[s[t] == 1, ])
             penalty <- 1 / abs(penalty$coefficients)
 
+            if (ncol(w) == 1) {
+                X <- model.matrix(~ ., as.data.frame(scale(w, T, F)))
+                p <- penalty
+            } else {
+                X <- model.matrix(~ ., as.data.frame(scale(w, T, F)))[, -1]
+                p <- penalty[-1]
+            }
+
             fit_V <- glmnet::cv.glmnet(
-                model.matrix(~ ., as.data.frame(scale(w, T, F)[t, ][s[t] == 1, ]))[, -1],
+                X[t, , drop = FALSE][s[t] == 1, , drop = FALSE],
                 as.matrix(tmp_T_OP[s[t] == 1]),
-                family = "gaussian", penalty.factor = penalty[-1], nfolds = 20
+                family = "gaussian", penalty.factor = p, nfolds = 20
             )
 
             V <- names(as.matrix(coef(fit_V, s = "lambda.min"))[which(as.matrix(coef(fit_V, s = "lambda.min")) != 0), ])[-1]
         }
 
         if (method == "adaptive-lasso") {
-            f_Wt <- predict(fit_V, s = "lambda.min", gamma = c(1),
-                                relax = TRUE, newx = scale(model.matrix(~ ., w)[, -1], T, F)[t, ])[, 1]
-            f_W[v] <- predict(fit_V, s = "lambda.min", gamma = c(1),
-                           relax = TRUE, newx = scale(model.matrix(~ ., w)[, -1], T, F)[v, ])[, 1]
+            f_Wt <- predict(fit_V, s = "lambda.min", gamma = c(1), relax = TRUE, newx = X[t, , drop = F])[, 1]
+            f_W[v] <- predict(fit_V, s = "lambda.min", gamma = c(1), relax = TRUE, newx = X[v, , drop = F])[, 1]
         }
 
         if (method == "sl") V <- names(w)
