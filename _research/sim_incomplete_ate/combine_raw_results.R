@@ -10,7 +10,7 @@ read_zip <- function(tar) {
     })
 }
 
-dgp <- 5
+dgp <- 2
 cv <- T
 
 case_when(dgp == 1 ~ source("_research/sim_incomplete_ate/dgp1.R"),

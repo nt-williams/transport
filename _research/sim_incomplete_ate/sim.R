@@ -4,7 +4,7 @@ suppressPackageStartupMessages({
     library(tidyverse)
 })
 
-dgp <- 1
+dgp <- 2
 crossfit <- T
 
 case_when(dgp == 1 ~ source("_research/sim_incomplete_ate/dgp1.R"),
