@@ -8,11 +8,11 @@ transport_Npsem <- R6::R6Class(
         Z = NULL,
         S = NULL,
         Y = NULL,
-        initialize = function(data, W, V = NULL, A = NULL, Z, S, Y) {
+        initialize = function(data, W, V = NULL, A, Z = NULL, S, Y) {
             checkmate::assertCharacter(W)
             checkmate::assertCharacter(V, null.ok = TRUE)
-            checkmate::assertCharacter(Z, len = 1)
-            checkmate::assertCharacter(A, len = 1, null.ok = TRUE)
+            checkmate::assertCharacter(Z, len = 1, null.ok = TRUE)
+            checkmate::assertCharacter(A, len = 1)
             checkmate::assertCharacter(S, len = 1)
             checkmate::assertCharacter(Y, len = 1)
 
@@ -63,11 +63,11 @@ transport_Npsem <- R6::R6Class(
         parents_A = function() {
             c(self$S, self$W)
         },
-        parents_Z = function() {
-            c(self$S, self$W, self$A)
-        },
+        # parents_Z = function() {
+        #     c(self$S, self$W, self$A)
+        # },
         parents_Y = function() {
-            c(self$Z, self$W)
+            c(self$A, self$W)
         }
     )
 )
