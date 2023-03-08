@@ -2,7 +2,7 @@ transport_ate <- function(transport_Npsem, learner, family, folds = 20) {
     folded <- make_folds(transport_Npsem$data, folds)
 
     s <- transport_Npsem$var("S", data = TRUE, drop = TRUE)
-    a <- transport_Npsem$var("Z", data = TRUE, drop = TRUE)
+    a <- transport_Npsem$var("A", data = TRUE, drop = TRUE)
     y <- transport_Npsem$var("Y", data = TRUE, drop = TRUE)
     y[is.na(y)] <- -999
 
@@ -25,13 +25,13 @@ transport_ate <- function(transport_Npsem, learner, family, folds = 20) {
         pred_S[v] <- predict_from_fit(fit_S, transport_Npsem$var("W", data = TRUE)[v, , drop = FALSE])
 
         # compute P(Z | S, W)
-        fit_Z <- train(transport_Npsem$history("Z", data = TRUE)[t, ],
-                       transport_Npsem$var("Z", data = TRUE, drop = TRUE)[t],
+        fit_Z <- train(transport_Npsem$history("A", data = TRUE)[t, ],
+                       transport_Npsem$var("A", data = TRUE, drop = TRUE)[t],
                        "binomial",
                        learner,
                        10)
 
-        pred_Z[v] <- predict_from_fit(fit_Z, transport_Npsem$modify("S", 1)$history("Z", data = TRUE)[v, ])
+        pred_Z[v] <- predict_from_fit(fit_Z, transport_Npsem$modify("S", 1)$history("A", data = TRUE)[v, ])
 
         # compute E(Y| S=1, Z, W)
         fit_Y <- train(transport_Npsem$history("Y", data = TRUE)[t, ][s[t] == 1, ],
@@ -41,8 +41,8 @@ transport_ate <- function(transport_Npsem, learner, family, folds = 20) {
                        10)
 
         pred_Y_z[v] <- predict_from_fit(fit_Y, transport_Npsem$history("Y", data = TRUE)[v, ])
-        pred_Y_1[v] <- predict_from_fit(fit_Y, transport_Npsem$modify("Z", 1)$history("Y", data = TRUE)[v, ])
-        pred_Y_0[v] <- predict_from_fit(fit_Y, transport_Npsem$modify("Z", 0)$history("Y", data = TRUE)[v, ])
+        pred_Y_1[v] <- predict_from_fit(fit_Y, transport_Npsem$modify("A", 1)$history("Y", data = TRUE)[v, ])
+        pred_Y_0[v] <- predict_from_fit(fit_Y, transport_Npsem$modify("A", 0)$history("Y", data = TRUE)[v, ])
     }
 
     lambda <- mean((pred_Y_1 - pred_Y_0)[s == 0])
@@ -56,7 +56,7 @@ transport_ate <- function(transport_Npsem, learner, family, folds = 20) {
 
     ipw <- s / (1 - mean(s)) * (1 / pred_Z) * hs
     d.w <- survey::svydesign(~ 1, weights = ipw[s == 1], data = transport_Npsem$data[s == 1, ])
-    f <- reformulate(transport_Npsem$Z, transport_Npsem$Y)
+    f <- reformulate(transport_Npsem$A, transport_Npsem$Y)
     fit <- survey::svyglm(f, design = d.w, data = transport_Npsem$data[s == 1, ])
 
     theta <- lambda + mean(eic)

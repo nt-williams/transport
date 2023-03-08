@@ -79,7 +79,7 @@ transport_ate_incomplete <- function(transport_Npsem, learner, family, folds = 2
 
     ipw <- s / (1 - mean(s)) * (1 / pred_Z) * hs
     d.w <- survey::svydesign(~ 1, weights = ipw[s == 1], data = transport_Npsem$data[s == 1, ])
-    f <- reformulate(transport_Npsem$Z, transport_Npsem$Y)
+    f <- reformulate(transport_Npsem$A, transport_Npsem$Y)
     fit <- survey::svyglm(f, design = d.w, data = transport_Npsem$data[s == 1, ])
 
     theta <- theta_init + mean(eic)
