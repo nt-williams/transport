@@ -10,7 +10,7 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
     }
 
     s <- transport_Npsem$var("S", data = TRUE, drop = TRUE)
-    a <- transport_Npsem$var("Z", data = TRUE, drop = TRUE)
+    a <- transport_Npsem$var("A", data = TRUE, drop = TRUE)
     y <- transport_Npsem$var("Y", data = TRUE, drop = TRUE)
     y[is.na(y)] <- -999
 
@@ -25,14 +25,14 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
         v <- folded[[i]]$validation_set
 
         # compute P(Z | S, W)
-        fit_Z <- train(transport_Npsem$history("Z", data = TRUE)[t, ],
-                       transport_Npsem$var("Z", data = TRUE, drop = TRUE)[t],
+        fit_Z <- train(transport_Npsem$history("A", data = TRUE)[t, ],
+                       transport_Npsem$var("A", data = TRUE, drop = TRUE)[t],
                        "binomial",
                        learner,
                        10)
 
-        pred_Zt <- predict_from_fit(fit_Z, transport_Npsem$modify("S", 1)$history("Z", data = TRUE)[t, ])
-        pred_Z[v] <- predict_from_fit(fit_Z, transport_Npsem$modify("S", 1)$history("Z", data = TRUE)[v, ])
+        pred_Zt <- predict_from_fit(fit_Z, transport_Npsem$modify("S", 1)$history("A", data = TRUE)[t, ])
+        pred_Z[v] <- predict_from_fit(fit_Z, transport_Npsem$modify("S", 1)$history("A", data = TRUE)[v, ])
 
         # compute E(Y| S=1, Z, W)
         fit_Y <- train(transport_Npsem$history("Y", data = TRUE)[t, ][s[t] == 1, ],
@@ -42,12 +42,12 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
                        10)
 
         pred_Y_zt <- predict_from_fit(fit_Y, transport_Npsem$history("Y", data = TRUE)[t, ])
-        pred_Y_1t <- predict_from_fit(fit_Y, transport_Npsem$modify("Z", 1)$history("Y", data = TRUE)[t, ])
-        pred_Y_0t <- predict_from_fit(fit_Y, transport_Npsem$modify("Z", 0)$history("Y", data = TRUE)[t, ])
+        pred_Y_1t <- predict_from_fit(fit_Y, transport_Npsem$modify("A", 1)$history("Y", data = TRUE)[t, ])
+        pred_Y_0t <- predict_from_fit(fit_Y, transport_Npsem$modify("A", 0)$history("Y", data = TRUE)[t, ])
 
         pred_Y_z[v] <- predict_from_fit(fit_Y, transport_Npsem$history("Y", data = TRUE)[v, ])
-        pred_Y_1[v] <- predict_from_fit(fit_Y, transport_Npsem$modify("Z", 1)$history("Y", data = TRUE)[v, ])
-        pred_Y_0[v] <- predict_from_fit(fit_Y, transport_Npsem$modify("Z", 0)$history("Y", data = TRUE)[v, ])
+        pred_Y_1[v] <- predict_from_fit(fit_Y, transport_Npsem$modify("A", 1)$history("Y", data = TRUE)[v, ])
+        pred_Y_0[v] <- predict_from_fit(fit_Y, transport_Npsem$modify("A", 0)$history("Y", data = TRUE)[v, ])
 
         pred_Z_z <- a[t] * pred_Zt + (1 - pred_Zt) * (1 - a[t])
 
@@ -105,12 +105,6 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
             fit_hsW <- glm(s ~ f_W, family = "binomial", data = data.frame(s = s[t], f_W = f_Wt))
             hsW[v] <- predict(fit_hsW, data.frame(f_W = f_W[v]), type = "response")
         } else {
-            # fit_hsW <- hal9001::fit_hal(as.matrix(f_Wt), s[t], family = "binomial")
-            # hsW[v] <- predict(fit_hsW, as.matrix(f_W[v]))
-
-            # fit_hsW <- glm(s ~ f_W, family = "binomial", data = data.frame(s = s[t], f_W = f_Wt))
-            # hsW[v] <- predict(fit_hsW, data.frame(f_W = f_W[v]), type = "response")
-
             fit_hsW <- train(data.frame(f_W = f_Wt),
                              s[t],
                              "binomial",
@@ -129,7 +123,7 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
 
     ipw <- s / (1 - mean(s)) * (1 / pred_Z) * hs
     d.w <- survey::svydesign(~ 1, weights = ipw[s == 1], data = transport_Npsem$data[s == 1, ])
-    f <- reformulate(transport_Npsem$Z, transport_Npsem$Y)
+    f <- reformulate(transport_Npsem$A, transport_Npsem$Y)
     fit <- survey::svyglm(f, design = d.w, data = transport_Npsem$data[s == 1, ])
 
     theta <- lambda + mean(eic)
