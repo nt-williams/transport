@@ -29,7 +29,7 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
                        transport_Npsem$var("A", data = TRUE, drop = TRUE)[t],
                        "binomial",
                        learner,
-                       10)
+                       20)
 
         pred_Zt <- predict_from_fit(fit_Z, transport_Npsem$modify("S", 1)$history("A", data = TRUE)[t, ])
         pred_Z[v] <- predict_from_fit(fit_Z, transport_Npsem$modify("S", 1)$history("A", data = TRUE)[v, ])
@@ -39,7 +39,7 @@ transport_ate_incomplete_sans_V <- function(transport_Npsem, learner, family,
                        transport_Npsem$var("Y", data = TRUE, drop = TRUE)[t][s[t] == 1],
                        family,
                        learner,
-                       10)
+                       20)
 
         pred_Y_zt <- predict_from_fit(fit_Y, transport_Npsem$history("Y", data = TRUE)[t, ])
         pred_Y_1t <- predict_from_fit(fit_Y, transport_Npsem$modify("A", 1)$history("Y", data = TRUE)[t, ])

@@ -9,13 +9,13 @@ transport_Npsem <- R6::R6Class(
         S = NULL,
         Y = NULL,
         R = NULL,
-        initialize = function(data, W, V = NULL, R = NULL, A, Z = NULL, S, Y) {
+        initialize = function(data, W, V = NULL, R = NULL, A, Z = NULL, S = NULL, Y) {
             checkmate::assertCharacter(W)
             checkmate::assertCharacter(V, null.ok = TRUE)
             checkmate::assertCharacter(Z, len = 1, null.ok = TRUE)
             checkmate::assertCharacter(A, len = 1)
             checkmate::assertCharacter(R, len = 1, null.ok = TRUE)
-            checkmate::assertCharacter(S, len = 1)
+            checkmate::assertCharacter(S, len = 1, null.ok = TRUE)
             checkmate::assertCharacter(Y, len = 1)
 
             self$data <- data
