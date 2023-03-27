@@ -2,29 +2,18 @@ suppressPackageStartupMessages(library(tidyverse))
 library(glue)
 library(kableExtra)
 
-dgp <- "dgp2"
+dgp <- 6
 cv <- F
 
-if (cv) {
-    dat <- readRDS(glue("_research/sim_incomplete_ate/results/{dgp}-cf.rds"))
-    datU <- readRDS(glue("_research/sim_incomplete_ate/results/{dgp}_U_TRUE.rds"))
-} else {
-    dat <- readRDS(glue("_research/sim_incomplete_ate/results/{dgp}.rds"))
-    datU <- readRDS(glue("_research/sim_incomplete_ate/results/{dgp}_U_FALSE.rds"))
-}
+res <- readRDS(glue("_research/sim_incomplete_ate/results/dgp{dgp}_{cv}.rds"))
 
-if (dgp == "dgp3") dgp <- "dgp5"
-
-filter(datU, estimator == "gamma2") |>
-    mutate(releff = estimvar / filter(dat, estimator == "lambda", n != 500)$estimvar,
-           order = 3) |>
-    bind_rows(filter(dat, !endsWith(estimator, "_ipw"), n != 500)) |>
-    arrange(n, order) |>
+filter(res, estimator %in% c("lambda", "theta", "theta1", "clambda1")) |>
+    mutate(releff = estimvar / rep(filter(res, estimator == "lambda")$estimvar, each = ifelse(dgp == 6, 4, 3))) |>
     select(estimator, n, absbias, coverage, nvar, estimvar, releff) |>
-    mutate(estimator = case_when(estimator == "theta" ~ "$\\theta$",
+    mutate(estimator = case_when(estimator == "theta" ~ "$\\gamma$",
                                  estimator == "lambda" ~ "$\\lambda$",
-                                 estimator == "gamma2" ~ "c-$\\lambda$",
-                                 TRUE ~ "c-$\\lambda$\\textsuperscript{a}")) |>
+                                 estimator == "theta1" ~ "$\\theta$",
+                                 estimator == "clambda1" ~ "c-$\\lambda$")) |>
     kbl("latex",
         booktabs = TRUE,
         digits = 2,

@@ -37,10 +37,10 @@ safe_sim <- possibly(function(n) {
                        n == 1000 ~ 20,
                        n == 1e4 ~ 10)
 
-    Np <- transport_Npsem$new(dat, c("W1"), Z = "A", S = "S", Y = "Y")
+    Np <- transport_Npsem$new(dat, c("W1"), A = "A", S = "S", Y = "Y")
     lambda <- transport_ate(Np, c("SL.glm", "SL.mean"), "gaussian")
 
-    Np <- transport_Npsem$new(dat, c("W1"), V = NULL, Z = "A", S = "S", Y = "Y")
+    Np <- transport_Npsem$new(dat, c("W1"), V = NULL, A = "A", S = "S", Y = "Y")
     theta <- transport_ate_incomplete(Np, c("SL.glm", "SL.mean"), "gaussian")
 
     data.frame(estimator = c("lambda", "theta", "lambda_ipw", "theta_ipw"),

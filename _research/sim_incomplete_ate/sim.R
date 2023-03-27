@@ -5,12 +5,13 @@ suppressPackageStartupMessages({
 })
 
 dgp <- 2
-crossfit <- T
+crossfit <- F
 
 case_when(dgp == 1 ~ source("_research/sim_incomplete_ate/dgp1.R"),
           dgp == 2 ~ source("_research/sim_incomplete_ate/dgp2.R"),
           dgp == 4 ~ source("_research/sim_incomplete_ate/dgp4.R"),
-          dgp == 5 ~ source("_research/sim_incomplete_ate/dgp5.R"))
+          dgp == 5 ~ source("_research/sim_incomplete_ate/dgp5.R"),
+          dgp == 6 ~ source("_research/sim_incomplete_ate/dgp6.R"))
 
 id <- Sys.getenv("SGE_TASK_ID")
 if (id == "undefined" || id == "") id <- 1
@@ -33,9 +34,23 @@ sim <- possibly(function(n) {
 
     if (dgp %in% c(1, 2)) {
         w <- c("W1")
-    } else {
+    } else if (dgp %in% c(4, 5)) {
         w <- c("W1", "W2")
+    } else {
+        w <- "W"
     }
+
+    Np <- transport_Npsem$new(dat, c("W"), V = c("V"), Z = c("Z"), A = "A", S = "S", Y = "Y")
+    transport_ate_incomplete1(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"), "gaussian", folds)
+
+    Np <- transport_Npsem$new(dat, c("W"), V = c("V", "Z"), A = "A", S = "S", Y = "Y")
+    transport_ate_incomplete(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"), "gaussian", folds)
+
+    Np <- transport_Npsem$new(dat, c("W", "V", "Z"), A = "A", S = "S", Y = "Y")
+    transport_ate_incomplete_sans_V(Np, c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.lightgbm"), "gaussian", "sl", folds)
+
+    Np <- transport_Npsem$new(dat, c("W", "Z", "V"), A = "A", S = "S", Y = "Y")
+    transport_ate(Np, c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.lightgbm"), "gaussian", folds)
 
     Np <- transport_Npsem$new(dat, w, Z = "A", S = "S", Y = "Y")
     gamma1 <- transport_ate_incomplete_sans_V(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"),
@@ -46,8 +61,13 @@ sim <- possibly(function(n) {
                                               "gaussian", "adaptive-lasso-sl", folds)
 
     Np <- transport_Npsem$new(dat, w, Z = "A", S = "S", Y = "Y")
-    gamma3 <- transport_ate_incomplete_sans_V(Np, c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.ranger"),
-                                              "gaussian", "sl", folds)
+    gamma3 <- transport_ate_incomplete_sans_V(
+        Np,
+        c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.lightgbm"),
+        "gaussian",
+        "sl",
+        folds
+    )
 
     data.frame(estimator = c("gamma1", "gamma1_ipw", "gamma2", "gamma2_ipw", "gamma3", "gamma3_ipw"),
                order = 1:6,

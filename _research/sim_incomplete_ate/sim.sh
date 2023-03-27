@@ -3,4 +3,6 @@
 cd transport
 Rscript=/nfs/apps/R/4.0.3/bin/Rscript
 export R_LIBS_USER=/ifs/home/msph/epi/ntw2117/R_4.0
-${Rscript} _research/sim_incomplete_ate/sim.R
+${Rscript} $1 $2
+
+exit 0
