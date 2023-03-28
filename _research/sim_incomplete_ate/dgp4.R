@@ -6,7 +6,7 @@ gendata <- function(n, A = NULL) {
         A <- rbinom(n, 1, 0.5)
     }
 
-    S <- rbinom(n, 1, 0.8 - 0.6*W1 - 0.199*W2)
+    S <- rbinom(n, 1, 0.8 - 0.6*W1 - 0.18*W2)
     # S <- rbinom(n, 1, 0.8 - 0.6*W1 - 0.15*W2)
 
     Yi <- rnorm(n, 1.2 + 0.25*A + 0.5*W1 + A*W1 + 0.5*W2)

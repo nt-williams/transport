@@ -15,8 +15,8 @@ read_zip <- function(tar) {
     })
 }
 
-dgp <- 1
-cv <- T
+dgp <- 4
+cv <- F
 
 source(glue("_research/sim_incomplete_ate/dgp{dgp}.R"))
 

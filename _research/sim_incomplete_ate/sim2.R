@@ -25,22 +25,25 @@ sim <- possibly(function(n) {
         folds <- 1
     }
 
-    w <- "W1"
+    w <- "W"
+    v <- "V"
+    z <- "Z"
 
-    Np <- transport_Npsem$new(dat, w, A = "A", S = "S", Y = "Y")
+    Np <- transport_Npsem$new(dat, c(w, v, z), A = "A", S = "S", Y = "Y")
     lambda <- transport_ate(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"), "gaussian", folds)
 
-    Np <- transport_Npsem$new(dat, w, V = NULL, A = "A", S = "S", Y = "Y")
+    Np <- transport_Npsem$new(dat, w, V = c(v, z), A = "A", S = "S", Y = "Y")
     theta <- transport_ate_incomplete(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"), "gaussian", folds)
 
-    # Np <- transport_Npsem$new(dat, w, V = v, Z = z, A = "A", S = "S", Y = "Y")
-    # theta1 <- transport_ate_incomplete1(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"), "gaussian", folds)
+    Np <- transport_Npsem$new(dat, w, V = v, Z = z, A = "A", S = "S", Y = "Y")
+    theta1 <- transport_ate_incomplete1(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"), "gaussian", folds)
     # theta2 <- transport_ate_incomplete2(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"), "gaussian", folds)
 
-    Np <- transport_Npsem$new(dat, w, A = "A", S = "S", Y = "Y")
+    Np <- transport_Npsem$new(dat, c(w, v, z), A = "A", S = "S", Y = "Y")
     clambda1 <- transport_ate_incomplete_sans_Z(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"),
                                                 "gaussian", T, folds)
 
+    Np <- transport_Npsem$new(dat, c(w, v, z), A = "A", S = "S", Y = "Y")
     clambda2 <- transport_ate_incomplete_sans_Z(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"),
                                                 "gaussian", F, folds)
 
