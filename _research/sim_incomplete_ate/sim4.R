@@ -42,8 +42,8 @@ sim <- possibly(function(n) {
     clambda1 <- transport_ate_incomplete_sans_Z(Np, c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.ranger", "SL.earth"),
                                                 "gaussian", T, folds)
 
-    clambda2 <- transport_ate_incomplete_sans_Z(Np, c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.ranger", "SL.earth"),
-                                                "gaussian", F, folds)
+    # clambda2 <- transport_ate_incomplete_sans_Z(Np, c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.ranger", "SL.earth"),
+    #                                             "gaussian", F, folds)
 
     # Np <- transport_Npsem$new(dat, c(w, v), A = "A", S = "S", Y = "Y")
     # clambda1 <- transport_ate_incomplete_sans_V(Np, c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.ranger", "SL.earth"),
@@ -55,11 +55,11 @@ sim <- possibly(function(n) {
     # clambda3 <- transport_ate_incomplete_sans_V(Np, c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.earth", "SL.ranger"),
     #                                             "gaussian", "sl", folds)
 
-    data.frame(estimator = c("lambda", "theta", "theta1", "clambda1", "clambda2"),
-               order = 1:5,
-               psi = c(lambda$theta, theta$theta, theta1$theta, clambda1$theta, clambda2$theta),
-               var = c(lambda$var, theta$var, theta1$var, clambda1$var, clambda2$var),
-               covered = map_lgl(list(lambda, theta, theta1, clambda1, clambda2), covered))
+    data.frame(estimator = c("lambda", "theta", "theta1", "clambda1"),
+               order = 1:4,
+               psi = c(lambda$theta, theta$theta, theta1$theta, clambda1$theta),
+               var = c(lambda$var, theta$var, theta1$var, clambda1$var),
+               covered = map_lgl(list(lambda, theta, theta1, clambda1), covered))
 }, NULL)
 
 res <- map_dfr(c(`100` = 100, `1000` = 1000, `1e4` = 1e4),

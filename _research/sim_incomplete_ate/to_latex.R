@@ -2,13 +2,13 @@ suppressPackageStartupMessages(library(tidyverse))
 library(glue)
 library(kableExtra)
 
-dgp <- 6
-cv <- F
+dgp <- 4
+cv <- T
 
 res <- readRDS(glue("_research/sim_incomplete_ate/results/dgp{dgp}_{cv}.rds"))
 
-filter(res, estimator %in% c("lambda", "theta", "theta1", "clambda1")) |>
-    mutate(releff = estimvar / rep(filter(res, estimator == "lambda")$estimvar, each = ifelse(dgp == 6, 4, 3))) |>
+filter(res, estimator %in% c("lambda", "theta1", "clambda1")) |>
+    mutate(releff = estimvar / rep(filter(res, estimator == "lambda")$estimvar, each = 3)) |>
     select(estimator, n, absbias, coverage, nvar, estimvar, releff) |>
     mutate(estimator = case_when(estimator == "theta" ~ "$\\gamma$",
                                  estimator == "lambda" ~ "$\\lambda$",

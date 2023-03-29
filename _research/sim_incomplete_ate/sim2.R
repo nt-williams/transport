@@ -40,12 +40,12 @@ sim <- possibly(function(n) {
     # theta2 <- transport_ate_incomplete2(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"), "gaussian", folds)
 
     Np <- transport_Npsem$new(dat, c(w, v, z), A = "A", S = "S", Y = "Y")
-    clambda1 <- transport_ate_incomplete_sans_Z(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"),
+    clambda1 <- transport_ate_incomplete_sans_Z(Np, c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.ranger", "SL.earth"),
                                                 "gaussian", T, folds)
 
-    Np <- transport_Npsem$new(dat, c(w, v, z), A = "A", S = "S", Y = "Y")
-    clambda2 <- transport_ate_incomplete_sans_Z(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"),
-                                                "gaussian", F, folds)
+    # Np <- transport_Npsem$new(dat, c(w, v, z), A = "A", S = "S", Y = "Y")
+    # clambda2 <- transport_ate_incomplete_sans_Z(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"),
+    #                                             "gaussian", F, folds)
 
     # Np <- transport_Npsem$new(dat, w, A = "A", S = "S", Y = "Y")
     # clambda1 <- transport_ate_incomplete_sans_V(Np, c("SL.glm", "SL.glm.interaction", "SL.mean"),
@@ -59,11 +59,11 @@ sim <- possibly(function(n) {
     # clambda3 <- transport_ate_incomplete_sans_V(Np, c("SL.glm", "SL.glm.interaction", "SL.mean", "SL.lightgbm"),
     #                                             "gaussian", "sl", folds)
 
-    data.frame(estimator = c("lambda", "theta", "clambda1", "clambda2"),
+    data.frame(estimator = c("lambda", "theta", "theta1", "clambda1"),
                order = 1:4,
-               psi = c(lambda$theta, theta$theta, clambda1$theta, clambda2$theta),
-               var = c(lambda$var, theta$var, clambda1$var, clambda2$var),
-               covered = map_lgl(list(lambda, theta, clambda1, clambda2), covered))
+               psi = c(lambda$theta, theta$theta, theta1$theta, clambda1$theta),
+               var = c(lambda$var, theta$var, theta1$var, clambda1$var),
+               covered = map_lgl(list(lambda, theta, theta1, clambda1), covered))
 }, NULL)
 
 res <- map_dfr(c(`100` = 100, `1000` = 1000, `1e4` = 1e4),
