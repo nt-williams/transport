@@ -22,3 +22,11 @@ eif_transport_ate <- function(data, trt, outcome, source, pi_trt, pi_src, m) {
          var = var(eif) / nrow(data),
          eif = eif)
 }
+
+eif_transport_ittate <- function() {
+
+}
+
+eif_transport_cace <- function() {
+
+}

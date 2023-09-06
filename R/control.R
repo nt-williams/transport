@@ -13,3 +13,11 @@
          folds_source = 10,
          folds_outcome = 10)
 }
+
+.transport_ittate_control <- function() {
+
+}
+
+.transport_cate_control <- function() {
+
+}
