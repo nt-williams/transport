@@ -40,6 +40,10 @@ assign_value <- function(data, assignments) {
     }
 
     lapply(seq_along(assignments), function(i, n) {
+        if (is.null(assignments[[i]])) {
+            return(data)
+        }
+
         data[[n[i]]] <- assignments[[i]]
         data
     }, n = names(assignments))

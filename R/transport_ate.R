@@ -44,19 +44,19 @@ transport_ate <- function(data, trt, outcome, source, covar, cens = NULL,
     checkmate::assert_character(cens, len = 1, null.ok = TRUE)
     checkmate::assert_character(id, len = 1, null.ok = TRUE)
     checkmate::assertSubset(c(trt, outcome, source, covar, id), names(data))
-    checkmate::assertNumeric(bounds, len = 2, finite = TRUE, any.missing = FALSE, sorted = TRUE, null.ok = TRUE)
 
     folds <- make_folds(data, control$folds)
 
     # Fit the propensity score
     fit_pi <- crossfit(data = data,
                        target = trt,
-                       covar = c(source, covar),
+                       covar = covar,
                        folds = folds,
-                       assignments = setNames(list(1), source),
+                       assignments = NULL,
                        outcome_type = "binomial",
                        learners = control$learners_trt,
-                       cvfolds = control$folds_trt)
+                       cvfolds = control$folds_trt,
+                       subset = data[[source]] == 1)
 
     # Fit the probability of being in the target population
     fit_S <- crossfit(data = data,
