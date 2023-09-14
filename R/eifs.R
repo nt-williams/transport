@@ -68,7 +68,6 @@ eif_transport_ittate <- function(data, instrument, trt, outcome, source,
 }
 
 eif_transport_cace <- function(data, instrument, trt, source, pi_I0, pi_trt0, eif_ittate) {
-    browser()
     S <- data[[source]]
     A <- data[[instrument]]
     Z <- data[[trt]]
