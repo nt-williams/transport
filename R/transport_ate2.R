@@ -102,4 +102,11 @@ transport_ate2 <- function(data, trt, outcome, source, covar,
          learner_weights_trt = fit_pi$weights,
          learner_weights_source = fit_S$weights,
          learner_weights_pseudo = fit_fV$weights)
+
+    class(out) <- c("transport", "transport_ate2")
+    out
+}
+
+print.transport_ate2 <- function() {
+
 }

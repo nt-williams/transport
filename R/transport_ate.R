@@ -81,8 +81,15 @@ transport_ate <- function(data, trt, outcome, source, covar, cens = NULL,
 
     eif <- eif_transport_ate(data, trt, outcome, source, fit_pi$pred, fit_S$pred, fit_m$pred)
 
-    list(estimates = eif,
-         learner_weights_outcome = fit_m$weights,
-         learner_weights_trt = fit_pi$weights,
-         learner_weights_source = fit_S$weights)
+    out <- list(estimates = eif,
+                learner_weights_outcome = fit_m$weights,
+                learner_weights_trt = fit_pi$weights,
+                learner_weights_source = fit_S$weights)
+
+    class(out) <- c("transport", "transport_ate")
+    out
+}
+
+print.transport_ate <- function() {
+
 }

@@ -49,8 +49,17 @@ transport_cate <- function(data, instrument, trt, outcome, source, covar, cens =
                                weights = NULL,
                                control = .transport_cate_control())
 
-    eif_transport_cace(data, instrument, trt, source,
-                       pi_I0 = ittate$pred_instrument_S0,
-                       pi_trt0 = ittate$pred_trt_S0,
-                       eif_ittate = ittate$estimates)
+    eif <- eif_transport_cace(data, instrument, trt, source,
+                              pi_I0 = ittate$pred_instrument_S0,
+                              pi_trt0 = ittate$pred_trt_S0,
+                              eif_ittate = ittate$estimates)
+
+    out <- list()
+
+    class(out) <- c("transport", "transport_cace")
+    out
+}
+
+print.transport_cace <- function() {
+
 }

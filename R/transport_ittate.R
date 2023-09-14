@@ -137,17 +137,24 @@ transport_ittate <- function(data, instrument, trt, outcome, source, covar, cens
                                 fit_IpiS1$pred, fit_ApiS0$pred, fit_ApiS1$pred, fit_S$pred,
                                 fit_m$pred, lapply(fit_pseudos, function(x) x$pred))
 
-    list(estimates = eif,
-         pred_instrument_S0 = fit_IpiS0$pred,
-         pred_instrument_S1 = fit_IpiS1$pred,
-         pred_trt_S0 = fit_ApiS0$pred,
-         pred_trt_S1 = fit_ApiS1$pred,
-         pred_source = fit_S$pred,
-         pred_outcome = fit_m$pred,
-         learner_weights_instrument_S0 = fit_IpiS0$weights,
-         learner_weights_instrument_S1 = fit_IpiS1$weights,
-         learner_weights_trt_S0 = fit_ApiS0$weights,
-         learner_weights_trt_S1 = fit_ApiS1$weights,
-         learner_weights_source = fit_S$weights,
-         learner_weights_outcome = fit_m$weights)
+    out <- list(estimates = eif,
+                pred_instrument_S0 = fit_IpiS0$pred,
+                pred_instrument_S1 = fit_IpiS1$pred,
+                pred_trt_S0 = fit_ApiS0$pred,
+                pred_trt_S1 = fit_ApiS1$pred,
+                pred_source = fit_S$pred,
+                pred_outcome = fit_m$pred,
+                learner_weights_instrument_S0 = fit_IpiS0$weights,
+                learner_weights_instrument_S1 = fit_IpiS1$weights,
+                learner_weights_trt_S0 = fit_ApiS0$weights,
+                learner_weights_trt_S1 = fit_ApiS1$weights,
+                learner_weights_source = fit_S$weights,
+                learner_weights_outcome = fit_m$weights)
+
+    class(out) <- c("transport", "transport_ittate")
+    out
+}
+
+print.transport_ittate <- function() {
+
 }
