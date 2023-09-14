@@ -97,3 +97,42 @@ eif_transport_cace <- function(data, instrument, trt, source, pi_I0, pi_trt0, ei
          var = var(eif) / nrow(data),
          eif = eif)
 }
+
+eif_TOP <- function(data, trt, source, outcome, pi_trt, m) {
+    Y <- data[[outcome]]
+    Y[is.na(Y)] <- -999
+    S <- data[[source]]
+    A <- data[[trt]]
+
+    `P(A|S=1,W)` <- A*pi_trt[, 1] + (1 - pi_trt[, 1])*(1 - A)
+    `f(W)` <- m[, 2] - m[, 1]
+    `g(W)` <- m[, 1]
+
+    ((2*A - 1) / `P(A|S=1,W)`) * (Y - A*`f(W)` - `g(W)`) + `f(W)`
+}
+
+eif_transport_ate2 <- function(data, trt, outcome, source, pi_trt, pi_src, m, fV) {
+    Y <- data[[outcome]]
+    Y[is.na(Y)] <- -999
+    S <- data[[source]]
+    A <- data[[trt]]
+
+    `1(S=1)` <- as.numeric(S == 1)
+    `1(S=0)` <- as.numeric(S == 0)
+    `P(S=0)` <- 1 - mean(S)
+    `P(S=1|V)` <- pi_src[, 1]
+    `P(S=0|V)` <- 1 - `P(S=1|V)`
+    `P(A|S=1,W)` <- A*pi_trt[, 1] + (1 - pi_trt[, 1])*(1 - A)
+    `f(V)` <- fV[, 1]
+    `g(W)` <- m[, 1]
+
+    theta_init <- mean(`f(V)`[S == 0])
+
+    ipw <- `1(S=1)` / `P(S=0)` * ((2*A - 1) / `P(A|S=1,W)`)
+    hs <- `P(S=0|V)` / `P(S=1|V)`
+    eif <- ipw * hs * (Y - A*`f(V)` - `g(W)`) + (`1(S=0)` / `P(S=0)`) * (`f(V)` - theta_init)
+
+    list(theta = theta_init + mean(eif),
+         var = var(eif) / nrow(data),
+         eif = eif)
+}
