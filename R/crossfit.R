@@ -31,7 +31,7 @@ crossfit <- function(data, target, covar, folds, assignments, outcome_type, lear
     i <- unlist(lapply(folds, function(x) x$validation_set))
 
     list(pred = do.call("rbind", lapply(fits, function(x) x$pred))[order(i), , drop = FALSE],
-         weights = lapply(fits, function(x) x$weights))
+         weights = do.call("rbind", lapply(fits, function(x) x$weights)))
 }
 
 assign_value <- function(data, assignments) {
