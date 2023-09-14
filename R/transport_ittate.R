@@ -52,47 +52,47 @@ transport_ittate <- function(data, instrument, trt, outcome, source, covar, cens
 
     # Fit the instrument-propensity score: P(A=1 | W,S=1)
     fit_IpiS1 <- crossfit(data = data,
-                        target = instrument,
-                        covar = covar,
-                        folds = folds,
-                        assignments = NULL,
-                        outcome_type = "binomial",
-                        learners = control$learners_trt,
-                        cvfolds = control$folds_trt,
-                        subset = data[[source]] == 1)
+                          target = instrument,
+                          covar = covar,
+                          folds = folds,
+                          assignments = NULL,
+                          outcome_type = "binomial",
+                          learners = control$learners_trt,
+                          cvfolds = control$folds_trt,
+                          subset = data[[source]] == 1)
 
-    # Fit the instrument-propensity score: P(A=1 | W,S=1)
+    # Fit the instrument-propensity score: P(A=1 | W,S=0)
     fit_IpiS0 <- crossfit(data = data,
-                        target = instrument,
-                        covar = covar,
-                        folds = folds,
-                        assignments = NULL,
-                        outcome_type = "binomial",
-                        learners = control$learners_trt,
-                        cvfolds = control$folds_trt,
-                        subset = data[[source]] == 0)
+                          target = instrument,
+                          covar = covar,
+                          folds = folds,
+                          assignments = NULL,
+                          outcome_type = "binomial",
+                          learners = control$learners_trt,
+                          cvfolds = control$folds_trt,
+                          subset = data[[source]] == 0)
 
-    # Fit the treatment-propensity score: P(Z=1 | A,S,W)
+    # Fit the treatment-propensity score: P(Z=1 | A,S=0,W)
     fit_ApiS0 <- crossfit(data = data,
-                       target = trt,
-                       covar = c(instrument, covar),
-                       folds = folds,
-                       assignments = setNames(list(0, 1), rep(instrument, 2)),
-                       outcome_type = "binomial",
-                       learners = control$learners_trt,
-                       cvfolds = control$folds_trt,
-                       subset = data[[source]] == 0)
+                          target = trt,
+                          covar = c(instrument, covar),
+                          folds = folds,
+                          assignments = setNames(list(0, 1), rep(instrument, 2)),
+                          outcome_type = "binomial",
+                          learners = control$learners_trt,
+                          cvfolds = control$folds_trt,
+                          subset = data[[source]] == 0)
 
-    # Fit the treatment-propensity score: P(Z=1 | A,S,W)
+    # Fit the treatment-propensity score: P(Z=1 | A,S=1,W)
     fit_ApiS1 <- crossfit(data = data,
-                        target = trt,
-                        covar = c(instrument, covar),
-                        folds = folds,
-                        assignments = setNames(list(0, 1), rep(instrument, 2)),
-                        outcome_type = "binomial",
-                        learners = control$learners_trt,
-                        cvfolds = control$folds_trt,
-                        subset = data[[source]] == 1)
+                          target = trt,
+                          covar = c(instrument, covar),
+                          folds = folds,
+                          assignments = setNames(list(0, 1), rep(instrument, 2)),
+                          outcome_type = "binomial",
+                          learners = control$learners_trt,
+                          cvfolds = control$folds_trt,
+                          subset = data[[source]] == 1)
 
     # Fit the probability of being in the target population: P(S=1 | W)
     fit_S <- crossfit(data = data,
@@ -138,6 +138,12 @@ transport_ittate <- function(data, instrument, trt, outcome, source, covar, cens
                                 fit_m$pred, lapply(fit_pseudos, function(x) x$pred))
 
     list(estimates = eif,
+         pred_instrument_S0 = fit_IpiS0$pred,
+         pred_instrument_S1 = fit_IpiS1$pred,
+         pred_trt_S0 = fit_ApiS0$pred,
+         pred_trt_S1 = fit_ApiS1$pred,
+         pred_source = fit_S$pred,
+         pred_outcome = fit_m$pred,
          learner_weights_instrument_S0 = fit_IpiS0$weights,
          learner_weights_instrument_S1 = fit_IpiS1$weights,
          learner_weights_trt_S0 = fit_ApiS0$weights,
