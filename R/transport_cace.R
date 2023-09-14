@@ -33,8 +33,24 @@
 #' @export
 #'
 #' @examples
-transport_cate <- function(data, trt, outcome, source, covar, cens = NULL,
+transport_cate <- function(data, instrument, trt, outcome, source, covar, cens = NULL,
                           outcome_type = c("binomial", "continuous"),
                           id = NULL, weights = NULL,
                           control = .transport_cate_control()) {
+    ittate <- transport_ittate(data = data,
+                               instrument = instrument,
+                               trt = trt,
+                               outcome = outcome,
+                               source = source,
+                               covar = covar,
+                               cens = cens,
+                               outcome_type = match.arg(outcome_type),
+                               id = NULL,
+                               weights = NULL,
+                               control = .transport_cate_control())
+
+    eif_transport_cace(data, instrument, trt, source,
+                       pi_I0 = ittate$pred_instrument_S0,
+                       pi_trt0 = ittate$pred_trt_S0,
+                       eif_ittate = ittate$estimates)
 }

@@ -24,6 +24,4 @@
          folds_outcome = 10)
 }
 
-.transport_cate_control <- function() {
-
-}
+.transport_cate_control <- .transport_ittate_control

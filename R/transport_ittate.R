@@ -128,8 +128,8 @@ transport_ittate <- function(data, instrument, trt, outcome, source, covar, cens
                  subset = data[[source]] == 0 & subset[[j]])
         },
         subset = list(rep(TRUE, nrow(data)),
-                      tmp[[instrument]] == 0,
-                      tmp[[instrument]] == 1),
+                      data[[instrument]] == 0,
+                      data[[instrument]] == 1),
         variables = list(c(covar, instrument), covar, covar)
     )
 

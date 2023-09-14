@@ -67,6 +67,34 @@ eif_transport_ittate <- function(data, instrument, trt, outcome, source,
 
 }
 
-eif_transport_cace <- function() {
+eif_transport_cace <- function(data, instrument, trt, source, pi_I0, pi_trt0, eif_ittate) {
+    browser()
+    S <- data[[source]]
+    A <- data[[instrument]]
+    Z <- data[[trt]]
 
+    `1(S=0)` <- as.numeric(S == 0)
+    `P(S=1)` <- mean(S)
+    `P(S=0)` <- 1 - `P(S=1)`
+    `P(A=1|S=0,W)` <- pi_I0[, 1]
+    `P(A=0|S=0,W)` <- 1 - `P(A=1|S=0,W)`
+    `P(Z=1|A=0,S=0,W)` <- pi_trt0[, 1]
+    `P(Z=1|A=1,S=0,W)` <- pi_trt0[, 2]
+    `P(Z=1|A=a,S=0,W)` <- A*`P(Z=1|A=1,S=0,W)` + (1 - A)*`P(Z=1|A=0,S=0,W)`
+
+    theta1 <- mean((`P(Z=1|A=0,S=0,W)` - `P(Z=1|A=1,S=0,W)`)[S == 0])
+
+    h0w <- `1(S=0)` * (1 - A) / (`P(A=0|S=0,W)`*`P(S=0)`)
+    h1w <- `1(S=0)` * A / (`P(A=1|S=0,W)`*`P(S=0)`)
+
+    eif_ate <- (((A * h1w) - ((1 - A) * h0w)) * (Z - `P(Z=1|A=a,S=0,W)`)) +
+        ((`1(S=0)` / `P(S=0)`) * ((`P(Z=1|A=1,S=0,W)` - `P(Z=1|A=0,S=0,W)`) - theta1))
+
+    theta_ate <- theta1 + mean(eif_ate)
+
+    eif <- (eif_ittate$eif / theta_ate) - (eif_ittate$theta / (theta_ate^2)) * eif_ate
+
+    list(theta = eif_ittate$theta / theta_ate,
+         var = var(eif) / nrow(data),
+         eif = eif)
 }
