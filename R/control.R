@@ -38,6 +38,14 @@
 #' @export
 #'
 #' @examples
+.transport_ate3_control <- .transport_ate2_control
+
+#' TODO
+#'
+#' @return
+#' @export
+#'
+#' @examples
 .transport_ittate_control <- function() {
     list(folds = 10,
          learners_trt = c("mean", "glm"),
