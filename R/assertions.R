@@ -7,4 +7,4 @@ check_binary <- function(x) {
   TRUE
 }
 
-assert_binary <- checkmate::makeAssertionFunction(check_binary)
+assert_binary <- makeAssertionFunction(check_binary)
