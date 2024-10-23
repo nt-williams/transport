@@ -1,0 +1,10 @@
+check_binary <- function(x) {
+  # Check if there are exactly two unique values and they are not 0 and 1
+  if (length(x) == 2 && !all(x %in% c(0, 1))) {
+    return("The outcome contains exactly two unique values, but they are not 0 and 1")
+  }
+
+  TRUE
+}
+
+assert_binary <- checkmate::makeAssertionFunction(check_binary)
