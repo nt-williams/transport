@@ -1,9 +1,18 @@
+#' @title Transport Task Class
+#'
+#' @description
+#'
+#' @export
+#' @examples
 TransportTask <- R6Class("TransportTask",
   public = list(
     outcome_type = NULL,
     data = NULL,
     col_roles = NULL,
     folds = NULL,
+
+    #' @description
+    #' Creates a new instance of this [R6][R6::R6Class] class.
     initialize = function(data, trt, outcome, covar, pop,
                           modifiers = NULL, obs = NULL,
                           group = NULL, weights = NULL, folds = 1) {
@@ -22,10 +31,18 @@ TransportTask <- R6Class("TransportTask",
       self$outcome_type <- private$get_outcome_type()
       self$folds <- private$make_folds(folds)
     },
-    print = function(x, ...) {
+
+    #' @description
+    #' Printer.
+    #' @param ... (ignored).
+    print = function(...) {
       cat("Transport task\n")
       print(head(self$data))
     },
+
+    #' @description
+    #' Get training and validation sets for a fold.
+    #' @param fold Fold number.
     training = function(fold) {
       TransportTaskSplit$new(
         self$data[self$folds[[fold]]$training_set, ],
@@ -33,6 +50,10 @@ TransportTask <- R6Class("TransportTask",
         self$col_roles
       )
     },
+
+    #' @description
+    #' Get training and validation sets for a fold.
+    #' @param fold Fold number.
     validation = function(fold) {
       TransportTaskSplit$new(
         self$data[self$folds[[fold]]$validation_set, ],
@@ -40,11 +61,19 @@ TransportTask <- R6Class("TransportTask",
         self$col_roles
       )
     },
+
+    #' @description
+    #' Subset and return the task data, keeping only features from `cols`.
+    #' @param cols A character vector of column names.
     select = function(cols) {
       assert_character(cols)
       assert_subset(cols, unlist(self$col_roles))
       self$data[, cols]
     },
+
+    #' @description
+    #' Subset and return the task data, keeping only features from `cols` that aren't censored.
+    #' @param cols A character vector of column names.
     observed = function(cols) {
       obs <- self$select(self$col_roles$obs)
       if (is.null(obs)) {
