@@ -7,7 +7,7 @@
 TransportTask <- R6Class("TransportTask",
   public = list(
     outcome_type = NULL,
-    data = NULL,
+    backend = NULL,
     col_roles = NULL,
     folds = NULL,
 
@@ -27,9 +27,14 @@ TransportTask <- R6Class("TransportTask",
         weights = weights
       )
 
-      self$data <- private$as_transport_data(data)
+      self$backend <- private$as_transport_data(data)
       self$outcome_type <- private$get_outcome_type()
       self$folds <- private$make_folds(folds)
+
+      private$.row_copy <- 1:nrow(self$backend)
+      private$.col_copy <- names(self$backend)
+      private$.row_roles <- private$.row_copy
+      private$.col_roles <- private$.col_copy
     },
 
     #' @description
@@ -37,7 +42,7 @@ TransportTask <- R6Class("TransportTask",
     #' @param ... (ignored).
     print = function(...) {
       cat("Transport task\n")
-      print(head(self$data))
+      print(head(self$backend))
     },
 
     #' @description
@@ -62,34 +67,57 @@ TransportTask <- R6Class("TransportTask",
       )
     },
 
+    data = function() {
+      i <- private$.row_roles
+      j <- private$.col_roles
+      private$.row_roles <- private$.row_copy
+      private$.col_roles <- private$.col_copy
+      self$backend[i, j]
+    },
+
     #' @description
     #' Subset and return the task data, keeping only features from `cols`.
     #' @param cols A character vector of column names.
     select = function(cols) {
       assert_character(cols)
       assert_subset(cols, unlist(self$col_roles))
-      self$data[, cols]
+      private$.col_roles <- intersect(private$.col_roles, cols)
+      invisible(self)
     },
 
     #' @description
-    #' Subset and return the task data, keeping only features from `cols` that aren't censored.
-    #' @param cols A character vector of column names.
-    observed = function(cols) {
-      obs <- self$select(self$col_roles$obs)
-      if (is.null(obs)) {
-        return(self$select(cols))
+    #' Subset and return the task data, keeping only rows that aren't censored.
+    obs = function() {
+      if (is.null(self$col_roles$obs)) {
+        return(invisible(self))
       }
 
-      self$select(cols)[self$select(self$col_roles$obs) == 1, ]
+      obs <- self$backend[[self$col_roles$obs]][private$.row_roles]
+      private$.row_roles <- intersect(private$.row_roles, which(obs))
+      invisible(self)
+    },
+
+    pop = function(x = c("source", "target")) {
+      pop <- self$backend[[self$col_roles$pop]][private$.row_roles]
+      if (match.arg(x) == "source") {
+        private$.row_roles <- intersect(private$.row_roles, which(pop == 0))
+      } else {
+        private$.row_roles <- intersect(private$.row_roles, which(pop == 1))
+      }
+      invisible(self)
     }
   ),
   private = list(
+    .row_copy = NULL,
+    .col_copy = NULL,
+    .row_roles = NULL,
+    .col_roles = NULL,
     as_transport_data = function(data) {
       assert_data_frame(data)
       assert_subset(unlist(self$col_roles), names(data))
-      assert_binary(unique(self$select(self$col_roles$pop)))
-
-      self$data <- data[, unlist(self$col_roles)]
+      assert_binary(unique(data[[self$col_roles$trt]]))
+      assert_binary(unique(data[[self$col_roles$trt]]))
+      data[, unlist(self$col_roles)]
     },
     make_folds = function(folds) {
       assert_number(folds, lower = 1, finite = TRUE)
@@ -97,29 +125,29 @@ TransportTask <- R6Class("TransportTask",
       if (folds == 1) {
         folded <- list(list(
           v = 1,
-          training_set = 1:nrow(self$data),
-          validation_set = 1:nrow(self$data)
+          training_set = 1:nrow(self$backend),
+          validation_set = 1:nrow(self$backend)
         ))
 
         return(folded)
       }
 
       if (is.null(self$col_roles$group) & self$outcome_type == "binomial") {
-        strata <- self$select(self$col_roles$outcome)
+        strata <- self$backend[[self$col_roles$outcome]]
         strata[is.na(strata)] <- 2
-        folded <- origami::make_folds(self$data, V = folds, strata_ids = strata)
+        folded <- origami::make_folds(self$backend, V = folds, strata_ids = strata)
         return(folded)
       }
 
       if (!is.null(self$col_roles$group)) {
-        folded <- origami::make_folds(self$data, cluster_ids = self$select(self$col_roles$group), V = folds)
+        folded <- origami::make_folds(self$backend, cluster_ids = self$backend[[self$col_roles$group]], V = folds)
         return(folded)
       }
 
       origami::make_folds(self$data, V = folds)
     },
     get_outcome_type = function() {
-      target <- na.omit(self$select(self$col_roles$outcome))
+      target <- na.omit(self$backend[[self$col_roles$outcome]])
       unique_values <- unique(target)
 
       assert_binary(unique_values)
