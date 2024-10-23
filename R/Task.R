@@ -23,7 +23,8 @@ TransportTask <- R6Class("TransportTask",
       self$folds <- private$make_folds(folds)
     },
     print = function(x, ...) {
-
+      cat("Transport task\n")
+      print(head(self$data))
     },
     training = function(fold) {
       TransportTaskSplit$new(
@@ -82,7 +83,7 @@ TransportTask <- R6Class("TransportTask",
       }
 
       if (!is.null(self$col_roles$group)) {
-        folded <- origami::make_folds(self$data, cluster_ids = self$select(self$col_roles_group), V = folds)
+        folded <- origami::make_folds(self$data, cluster_ids = self$select(self$col_roles$group), V = folds)
         return(folded)
       }
 
