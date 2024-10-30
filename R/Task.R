@@ -50,7 +50,7 @@ TransportTask <- R6Class("TransportTask",
     #' @param fold Fold number.
     training = function(fold) {
       TransportTaskSplit$new(
-        self$data[self$folds[[fold]]$training_set, ],
+        self$backend[self$folds[[fold]]$training_set, ],
         self$outcome_type,
         self$col_roles
       )
@@ -61,7 +61,7 @@ TransportTask <- R6Class("TransportTask",
     #' @param fold Fold number.
     validation = function(fold) {
       TransportTaskSplit$new(
-        self$data[self$folds[[fold]]$validation_set, ],
+        self$backend[self$folds[[fold]]$validation_set, ],
         self$outcome_type,
         self$col_roles
       )
@@ -73,6 +73,12 @@ TransportTask <- R6Class("TransportTask",
       private$.row_roles <- private$.row_copy
       private$.col_roles <- private$.col_copy
       self$backend[i, j]
+    },
+
+    reset = function() {
+      private$.row_roles <- private$.row_copy
+      private$.col_roles <- private$.col_copy
+      invisible(self)
     },
 
     #' @description
@@ -144,7 +150,7 @@ TransportTask <- R6Class("TransportTask",
         return(folded)
       }
 
-      origami::make_folds(self$data, V = folds)
+      origami::make_folds(self$backend, V = folds)
     },
     get_outcome_type = function() {
       target <- na.omit(self$backend[[self$col_roles$outcome]])
@@ -165,10 +171,15 @@ TransportTaskSplit <- R6Class("TransportTaskSplit",
   inherit = TransportTask,
   public = list(
     initialize = function(data, outcome_type, col_roles) {
-      self$data <- data
+      self$backend <- data
       self$outcome_type <- outcome_type
       self$col_roles <- col_roles
       self$folds <- NULL
+
+      private$.row_copy <- 1:nrow(self$backend)
+      private$.col_copy <- names(self$backend)
+      private$.row_roles <- private$.row_copy
+      private$.col_roles <- private$.col_copy
     }
   )
 )

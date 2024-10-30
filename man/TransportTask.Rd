@@ -12,11 +12,20 @@ Transport Task Class
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-TransportTask-new}{\code{TransportTask$new()}}
-\item \href{#method-TransportTask-print}{\code{TransportTask$print()}}
+\item \href{#method-TransportTask-history}{\code{TransportTask$history()}}
+\item \href{#method-TransportTask-features}{\code{TransportTask$features()}}
 \item \href{#method-TransportTask-training}{\code{TransportTask$training()}}
 \item \href{#method-TransportTask-validation}{\code{TransportTask$validation()}}
+\item \href{#method-TransportTask-data}{\code{TransportTask$data()}}
+\item \href{#method-TransportTask-reset}{\code{TransportTask$reset()}}
 \item \href{#method-TransportTask-select}{\code{TransportTask$select()}}
-\item \href{#method-TransportTask-observed}{\code{TransportTask$observed()}}
+\item \href{#method-TransportTask-modify}{\code{TransportTask$modify()}}
+\item \href{#method-TransportTask-obs}{\code{TransportTask$obs()}}
+\item \href{#method-TransportTask-pop}{\code{TransportTask$pop()}}
+\item \href{#method-TransportTask-nrow}{\code{TransportTask$nrow()}}
+\item \href{#method-TransportTask-nfolds}{\code{TransportTask$nfolds()}}
+\item \href{#method-TransportTask-scale}{\code{TransportTask$scale()}}
+\item \href{#method-TransportTask-rescale}{\code{TransportTask$rescale()}}
 \item \href{#method-TransportTask-clone}{\code{TransportTask$clone()}}
 }
 }
@@ -24,107 +33,136 @@ Transport Task Class
 \if{html}{\out{<a id="method-TransportTask-new"></a>}}
 \if{latex}{\out{\hypertarget{method-TransportTask-new}{}}}
 \subsection{Method \code{new()}}{
-Creates a new instance of this [R6][R6::R6Class] class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TransportTask$new(
-  data,
-  trt,
-  outcome,
-  covar,
-  pop,
-  modifiers = NULL,
-  obs = NULL,
-  group = NULL,
-  weights = NULL,
-  folds = 1
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TransportTask$new(data, A, Y, W, S, C, id, weights, folds = 1)}\if{html}{\out{</div>}}
 }
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TransportTask-print"></a>}}
-\if{latex}{\out{\hypertarget{method-TransportTask-print}{}}}
-\subsection{Method \code{print()}}{
-Printer.
+\if{html}{\out{<a id="method-TransportTask-history"></a>}}
+\if{latex}{\out{\hypertarget{method-TransportTask-history}{}}}
+\subsection{Method \code{history()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TransportTask$print(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TransportTask$history(var)}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{(ignored).}
 }
-\if{html}{\out{</div>}}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransportTask-features"></a>}}
+\if{latex}{\out{\hypertarget{method-TransportTask-features}{}}}
+\subsection{Method \code{features()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransportTask$features(model)}\if{html}{\out{</div>}}
 }
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TransportTask-training"></a>}}
 \if{latex}{\out{\hypertarget{method-TransportTask-training}{}}}
 \subsection{Method \code{training()}}{
-Get training and validation sets for a fold.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TransportTask$training(fold)}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{fold}}{Fold number.}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TransportTask-validation"></a>}}
 \if{latex}{\out{\hypertarget{method-TransportTask-validation}{}}}
 \subsection{Method \code{validation()}}{
-Get training and validation sets for a fold.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TransportTask$validation(fold)}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{fold}}{Fold number.}
 }
-\if{html}{\out{</div>}}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransportTask-data"></a>}}
+\if{latex}{\out{\hypertarget{method-TransportTask-data}{}}}
+\subsection{Method \code{data()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransportTask$data(reset = TRUE)}\if{html}{\out{</div>}}
 }
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransportTask-reset"></a>}}
+\if{latex}{\out{\hypertarget{method-TransportTask-reset}{}}}
+\subsection{Method \code{reset()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransportTask$reset()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TransportTask-select"></a>}}
 \if{latex}{\out{\hypertarget{method-TransportTask-select}{}}}
 \subsection{Method \code{select()}}{
-Subset and return the task data, keeping only features from `cols`.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TransportTask$select(cols)}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{cols}}{A character vector of column names.}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TransportTask-observed"></a>}}
-\if{latex}{\out{\hypertarget{method-TransportTask-observed}{}}}
-\subsection{Method \code{observed()}}{
-Subset and return the task data, keeping only features from `cols` that aren't censored.
+\if{html}{\out{<a id="method-TransportTask-modify"></a>}}
+\if{latex}{\out{\hypertarget{method-TransportTask-modify}{}}}
+\subsection{Method \code{modify()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TransportTask$observed(cols)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TransportTask$modify(col, x)}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{cols}}{A character vector of column names.}
 }
-\if{html}{\out{</div>}}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransportTask-obs"></a>}}
+\if{latex}{\out{\hypertarget{method-TransportTask-obs}{}}}
+\subsection{Method \code{obs()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransportTask$obs()}\if{html}{\out{</div>}}
 }
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransportTask-pop"></a>}}
+\if{latex}{\out{\hypertarget{method-TransportTask-pop}{}}}
+\subsection{Method \code{pop()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransportTask$pop(x = c("source", "target"))}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransportTask-nrow"></a>}}
+\if{latex}{\out{\hypertarget{method-TransportTask-nrow}{}}}
+\subsection{Method \code{nrow()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransportTask$nrow()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransportTask-nfolds"></a>}}
+\if{latex}{\out{\hypertarget{method-TransportTask-nfolds}{}}}
+\subsection{Method \code{nfolds()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransportTask$nfolds()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransportTask-scale"></a>}}
+\if{latex}{\out{\hypertarget{method-TransportTask-scale}{}}}
+\subsection{Method \code{scale()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransportTask$scale(x)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransportTask-rescale"></a>}}
+\if{latex}{\out{\hypertarget{method-TransportTask-rescale}{}}}
+\subsection{Method \code{rescale()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransportTask$rescale(x)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TransportTask-clone"></a>}}
