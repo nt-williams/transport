@@ -7,15 +7,13 @@ TransportTask <- R6Class("TransportTask",
 
     initialize = function(data, A, Y, W, S, C, id, weights, folds = 1) {
       self$col_roles <- TransportVars$new(W, S, A, C, Y, id, weights)
-
       self$backend <- private$as_transport_data(data)
-      self$outcome_type <- private$get_outcome_type()
       self$folds <- private$make_folds(folds)
 
       private$.row_copy <- 1:nrow(self$backend)
       private$.col_copy <- names(self$backend)
-      private$.row_roles <- private$.row_copy
-      private$.col_roles <- private$.col_copy
+      private$.active_rows <- private$.row_copy
+      private$.active_cols <- private$.col_copy
     },
 
     history = function(var) {
@@ -37,29 +35,33 @@ TransportTask <- R6Class("TransportTask",
     },
 
     data = function(reset = TRUE) {
-      i <- private$.active_rows
-      j <- private$.active_cols
+      i <- self$active_rows
+      j <- self$active_cols
 
       if (reset) self$reset()
+
+      if (is.null(j)) return(NULL)
 
       self$backend[i, j]
     },
 
     reset = function() {
-      private$.active_rows <- private$.row_copy
-      private$.active_cols <- private$.col_copy
+      self$active_rows <- private$.row_copy
+      self$active_cols <- private$.col_copy
       invisible(self)
     },
 
     select = function(cols) {
-      assert_character(cols)
-      private$.active_cols <- intersect(private$.active_cols, cols)
+      assert_character(cols, null.ok = TRUE)
+      self$active_cols <- intersect(self$active_cols, cols)
       invisible(self)
     },
 
     modify = function(col, x) {
+      old <- self$backend[self$active_rows, col]
+      on.exit(self$backend[self$active_rows, col] <- old)
       self$backend[self$active_rows, col] <- x
-      invisible(self)
+      self$data(reset = FALSE)
     },
 
     obs = function() {
@@ -121,8 +123,18 @@ TransportTask <- R6Class("TransportTask",
     bounds = NULL,
     as_transport_data = function(data) {
       assert_data_frame(data)
-      assert_subset(unlist(self$col_roles), names(data))
-      assert_binary(unique(data[[self$col_roles$trt]]))
+      assert_subset(self$col_roles$all(), names(data))
+      assert_binary(data[[self$col_roles$A]])
+      assert_binary(data[[self$col_roles$S]])
+      assert_numeric(data[[self$col_roles$Y]], any.missing = TRUE)
+
+      # need to add test for only missing allowed with S = 0 or C = 1
+
+      self$outcome_type <- get_outcome_type(data, self$col_roles$Y)
+
+      private$bounds <- y_bounds(data[[self$col_roles$Y]], self$outcome_type)
+      data[[self$col_roles$Y]] <- self$scale(data[[self$col_roles$Y]])
+
       data[, self$col_roles$all()]
     },
 
@@ -152,19 +164,6 @@ TransportTask <- R6Class("TransportTask",
       }
 
       origami::make_folds(self$backend, V = folds)
-    },
-
-    get_outcome_type = function() {
-      target <- na.omit(self$backend[[self$col_roles$outcome]])
-      unique_values <- unique(target)
-
-      assert_binary(unique_values)
-
-      if (!all(target %in% c(0, 1))) {
-        return("continuous")
-      }
-
-      "binary"
     }
   )
 )

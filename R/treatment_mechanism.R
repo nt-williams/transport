@@ -18,7 +18,8 @@ crossfit_propensity.TransportTask <- function(task, learners, control, pb) {
 
   ans <- future::value(ans)
 
-  # do something
+  list(ratios = recombine(rbind_depth(ans, "prop_score"), task$folds),
+       fits = lapply(ans, \(x) x[["fit"]]))
 }
 
 estimate_propensity.TransportTask <- function(train, valid, learners, control, pb) {
@@ -30,20 +31,17 @@ estimate_propensity.TransportTask <- function(train, valid, learners, control, p
   features <- train$features("A")
   target <- train$col_roles$A
 
-  # Subset columns
-  train$select(c(features, target))
-
   fit <- train_nuisance(
-    train$data(),
+    train$select(c(features, target))$data(),
     target,
     learners,
     "binomial",
-    "lmtp_id",
+    train$select(train$col_roles$id)$data(),
     control$.learners_trt_folds,
     control$.discrete,
     control$.info
   )
 
   list(prop_score = matrix(predict(fit, newdata = valid$data()), ncol = 1),
-       fit = fit)
+       fit = return_full_fit(fit, control))
 }

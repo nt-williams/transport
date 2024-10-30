@@ -27,9 +27,9 @@ TransportVars <- R6Class("TransportVars",
 
     history = function(var = c("S", "A", "Y")) {
       switch(match.arg(var),
-        S = self$parents_S(),
-        A = self$parents_A(),
-        Y = self$parents_Y()
+        S = private$parents_S(),
+        A = private$parents_A(),
+        Y = private$parents_Y()
       )
     },
 
