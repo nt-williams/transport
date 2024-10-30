@@ -28,6 +28,7 @@ transport_ate <- function(data,
   # the number likely needs to be dynamic
   pb <- progressr::progressor(folds*3)
 
+  prob_target <- crossfit_population(task, learners_trt, control, pb)
   prop_scores <- crossfit_propensity(task, learners_trt, control, pb)
-
+browser()
 }

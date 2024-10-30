@@ -1,4 +1,4 @@
-train_nuisance <- function(data, y, learners, outcome_type, id, folds, discrete, info) {
+train <- function(data, y, learners, outcome_type, id, folds, discrete, info) {
   fit <- mlr3superlearner::mlr3superlearner(
     data = data,
     target = y,

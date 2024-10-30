@@ -1,9 +1,9 @@
-crossfit_propensity <- function(x, ...) {
-  UseMethod("crossfit_propensity")
+crossfit_population <- function(x, ...) {
+  UseMethod("crossfit_population")
 }
 
 #' @export
-crossfit_propensity.TransportTask <- function(task, learners, control, pb) {
+crossfit_population.TransportTask <- function(task, learners, control, pb) {
   ans <- vector("list", length = task$nfolds())
 
   for (fold in seq_along(task$folds)) {
@@ -11,27 +11,27 @@ crossfit_propensity.TransportTask <- function(task, learners, control, pb) {
     valid <- task$validation(fold)
 
     ans[[fold]] <- future::future({
-      estimate_propensity.TransportTask(train, valid, learners, control, pb)
+      estimate_population.TransportTask(train, valid, learners, control, pb)
     },
     seed = TRUE)
   }
 
   ans <- future::value(ans)
 
-  list(ratios = recombine(rbind_depth(ans, "prop_score"), task$folds),
+  list(prob = recombine(rbind_depth(ans, "prob_target"), task$folds),
        fits = lapply(ans, \(x) x[["fit"]]))
 }
 
-estimate_propensity.TransportTask <- function(train, valid, learners, control, pb) {
+estimate_population.TransportTask <- function(train, valid, learners, control, pb) {
   on.exit(pb())
 
   train$reset()
   valid$reset()
 
-  features <- train$features("A")
-  target <- train$col_roles$A
+  features <- train$features("S")
+  target <- train$col_roles$S
 
-  fit <- train_nuisance(
+  fit <- train(
     train$select(c(features, target))$data(),
     target,
     learners,
@@ -42,6 +42,6 @@ estimate_propensity.TransportTask <- function(train, valid, learners, control, p
     control$.info
   )
 
-  list(prop_score = matrix(predict(fit, newdata = valid$data()), ncol = 1),
+  list(prob_target = matrix(predict(fit, newdata = valid$data()), ncol = 1),
        fit = return_full_fit(fit, control))
 }
