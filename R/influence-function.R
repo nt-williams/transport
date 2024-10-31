@@ -35,6 +35,7 @@ influence_function.standard <- function(nuisance, task) {
   ife::ife(lambda + mean(eic), eic)
 }
 
+#' @export
 influence_function.ate <- function(nuisance, task) {
   task$reset()
 
@@ -54,6 +55,7 @@ influence_function.ate <- function(nuisance, task) {
   ife::ife(mean(eic), eic)
 }
 
+#' @export
 influence_function.collaborative <- function(nuisance, task) {
   task$reset()
 

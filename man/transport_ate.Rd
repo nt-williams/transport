@@ -2,7 +2,7 @@
 % Please edit documentation in R/transport_ate.R
 \name{transport_ate}
 \alias{transport_ate}
-\title{Title}
+\title{Transported Average Treatment Effect}
 \usage{
 transport_ate(
   data,
@@ -23,8 +23,108 @@ transport_ate(
 )
 }
 \arguments{
-\item{control}{}
+\item{data}{[\code{data.frame}]\cr
+A \code{data.frame} in containing all necessary variables for the estimation problem.}
+
+\item{trt}{[\code{character(1)}]
+The column name of the treatment variable. This variable must be binary (0/1).}
+
+\item{outcome}{[\code{character(1)}]\cr
+The column name of the outcome variable. This variable must be binary (0/1) or numeric.}
+
+\item{covar}{[\code{character}]\cr
+An optional vector containing the column names of covariates to be
+included for adjustment.}
+
+\item{pop}{[\code{character(1)}]\cr
+The column name of the population indicator variable.
+This variable must be binary (0/1) with 0 indicating the target population and 1 the source population.}
+
+\item{obs}{[\code{character(1)}]\cr
+An optional column name for a censoring indicator the same. If missingness in the outcome is
+present, must be provided. This variable must be binary (0/1) with 1 indicating that the outcome is observed.}
+
+\item{id}{[\code{character(1)}]\cr
+An optional column name containing cluster level identifiers.}
+
+\item{weights}{[\code{character(1)}]\cr
+An optional column name containing sampling weights. Currently not used.}
+
+\item{estimator}{[\code{character(1)}]\cr
+The estimator to use. See details for more information.}
+
+\item{learners_trt}{[\code{character}]\cr
+A vector of \code{mlr3superlearner} algorithms for estimation of the propensity score.}
+
+\item{learners_pop}{[\code{character}]\cr
+A vector of \code{mlr3superlearner} algorithms for estimation of the population mechanism.}
+
+\item{learners_outcome}{[\code{character}]\cr
+A vector of \code{mlr3superlearner} algorithms for estimation of the outcome regression.}
+
+\item{learners_heterogeneity}{[\code{character}]\cr
+A vector of \code{mlr3superlearner} algorithms for estimation of collaborative nuisance parameters.
+Ignored when \code{estimator = "standard"}.}
+
+\item{folds}{[\code{integer(1)}]\cr
+The number of folds to be used for cross-fitting.}
+
+\item{control}{[\code{list()}]\cr
+Output of \code{transport_control()}.}
+}
+\value{
+An object of class \code{transported_ate} containing the parameter estimate.
 }
 \description{
-Title
+Implements two one-step estimators for the transported average treatment effect for a binary or continuous outcome.
+Nuisance parameters are estimated using the Super Learner algorithm.
+}
+\details{
+\subsection{Estimators}{
+
+\emph{TODO}
+}
+}
+\examples{
+gendata <- function(n, A = NULL) {
+  W <- rbinom(n, 1, 0.5)
+  V <- rbinom(n, 1, 0.66)
+  Z <- rbinom(n, 1, 0.33)
+
+  if (is.null(A)) A <- rbinom(n, 1, 0.5)
+
+  S <- rbinom(n, 1, 0.4 + 0.5*W - 0.3*Z)
+
+  Yi <- rnorm(n, A + W + A*V + 2.5*A*Z, sqrt((0.1 + 0.8*W)^2))
+  Y <- ifelse(S == 1, Yi, NA_real_)
+
+  data.frame(W = W,
+             V = V,
+             Z = Z,
+             S = S,
+             A = A,
+             Y = Y,
+             Yi = Yi)
+}
+
+set.seed(123)
+n <- 250
+
+tmp <- gendata(n)
+
+transport_ate(data = data,
+              trt = "A",
+              outcome = "Y",
+              covar = c("W", "V", "Z"),
+              pop = "S",
+              estimator = "standard",
+              folds = 1)
+
+transport_ate(data = data,
+              trt = "A",
+              outcome = "Y",
+              covar = c("W", "V", "Z"),
+              pop = "S",
+              estimator = "collaborative",
+              folds = 1)
 }
