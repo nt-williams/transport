@@ -1,9 +1,9 @@
-crossfit_propensity <- function(x, ...) {
-  UseMethod("crossfit_propensity")
+crossfit_heterogeneity <- function(x, ...) {
+  UseMethod("crossfit_heterogeneity")
 }
 
 #' @export
-crossfit_propensity.TransportTask <- function(task, learners, control) {
+crossfit_heterogeneity.TransportTask <- function(task, learners, control) {
   ans <- vector("list", length = task$nfolds())
 
   for (fold in seq_along(task$folds)) {
@@ -11,7 +11,7 @@ crossfit_propensity.TransportTask <- function(task, learners, control) {
     valid <- task$validation(fold)
 
     ans[[fold]] <- future::future({
-      estimate_propensity.TransportTask(train, valid, learners, control)
+      estimate_heterogeneity.TransportTask(train, valid, learners, control)
     },
     seed = TRUE)
   }
@@ -22,18 +22,18 @@ crossfit_propensity.TransportTask <- function(task, learners, control) {
        fits = lapply(ans, \(x) x[["fit"]]))
 }
 
-estimate_propensity.TransportTask <- function(train, valid, learners, control) {
+estimate_heterogeneity.TransportTask <- function(train, valid, learners, control) {
   train$reset()
   valid$reset()
 
-  features <- train$features("A")
-  target <- train$col_roles$A
+  features <- "estimated_source_prob"
+  target <- "estimated_cate"
 
   fit <- train(
     train$select(c(features, target))$data(),
     target,
     learners,
-    "binomial",
+    "continuous",
     train$select(train$col_roles$id)$data(),
     control$.learners_folds,
     control$.discrete,

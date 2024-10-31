@@ -1,9 +1,9 @@
-crossfit_propensity <- function(x, ...) {
-  UseMethod("crossfit_propensity")
+crossfit_cate <- function(x, ...) {
+  UseMethod("crossfit_cate")
 }
 
 #' @export
-crossfit_propensity.TransportTask <- function(task, learners, control) {
+crossfit_cate.TransportTask <- function(task, learners, control) {
   ans <- vector("list", length = task$nfolds())
 
   for (fold in seq_along(task$folds)) {
@@ -11,7 +11,7 @@ crossfit_propensity.TransportTask <- function(task, learners, control) {
     valid <- task$validation(fold)
 
     ans[[fold]] <- future::future({
-      estimate_propensity.TransportTask(train, valid, learners, control)
+      estimate_cate.TransportTask(train, valid, learners, control)
     },
     seed = TRUE)
   }
@@ -22,19 +22,19 @@ crossfit_propensity.TransportTask <- function(task, learners, control) {
        fits = lapply(ans, \(x) x[["fit"]]))
 }
 
-estimate_propensity.TransportTask <- function(train, valid, learners, control) {
+estimate_cate.TransportTask <- function(train, valid, learners, control) {
   train$reset()
   valid$reset()
 
-  features <- train$features("A")
-  target <- train$col_roles$A
+  features <- train$features("S")
+  target <- "eif_ate"
 
   fit <- train(
-    train$select(c(features, target))$data(),
+    train$pop("source")$select(c(features, target))$data(),
     target,
     learners,
-    "binomial",
-    train$select(train$col_roles$id)$data(),
+    "continuous",
+    train$pop("source")$select(train$col_roles$id)$data(),
     control$.learners_folds,
     control$.discrete,
     control$.info

@@ -31,3 +31,20 @@ return_full_fit <- function(fit, control) {
 summary.mlr3superlearner <- function(fit) {
   cbind(Risk = fit$risk)
 }
+
+`%*0%` <- function(x, y) {
+  res <- x * y
+  res[is.na(res)] <- 0
+  res
+}
+
+progress_bar <- function(estimator, folds) {
+  switch(estimator,
+    standard = progressr::progressor(folds*3),
+    collaborative = progressr::progressor(folds*6)
+  )
+}
+
+get_item <- function(x, name) {
+  lapply(x, \(y) y[[name]])
+}

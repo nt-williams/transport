@@ -3,7 +3,7 @@ crossfit_population <- function(x, ...) {
 }
 
 #' @export
-crossfit_population.TransportTask <- function(task, learners, control, pb) {
+crossfit_population.TransportTask <- function(task, learners, control) {
   ans <- vector("list", length = task$nfolds())
 
   for (fold in seq_along(task$folds)) {
@@ -11,20 +11,18 @@ crossfit_population.TransportTask <- function(task, learners, control, pb) {
     valid <- task$validation(fold)
 
     ans[[fold]] <- future::future({
-      estimate_population.TransportTask(train, valid, learners, control, pb)
+      estimate_population.TransportTask(train, valid, learners, control)
     },
     seed = TRUE)
   }
 
   ans <- future::value(ans)
 
-  list(probs = recombine(rbind_depth(ans, "prob"), task$folds),
+  list(pred = recombine(rbind_depth(ans, "pred"), task$folds),
        fits = lapply(ans, \(x) x[["fit"]]))
 }
 
-estimate_population.TransportTask <- function(train, valid, learners, control, pb) {
-  on.exit(pb())
-
+estimate_population.TransportTask <- function(train, valid, learners, control) {
   train$reset()
   valid$reset()
 
@@ -37,11 +35,11 @@ estimate_population.TransportTask <- function(train, valid, learners, control, p
     learners,
     "binomial",
     train$select(train$col_roles$id)$data(),
-    control$.learners_pop_folds,
+    control$.learners_folds,
     control$.discrete,
     control$.info
   )
 
-  list(prob = matrix(predict(fit, newdata = valid$data()), ncol = 1),
+  list(pred = matrix(predict(fit, newdata = valid$data()), ncol = 1),
        fit = return_full_fit(fit, control))
 }

@@ -64,6 +64,13 @@ TransportTask <- R6Class("TransportTask",
       self$data(reset = FALSE)
     },
 
+    add_var = function(var, name) {
+      self$backend[[name]] <- var
+      private$.col_copy <- c(private$.col_copy, name)
+      self$reset()
+      invisible(self)
+    },
+
     obs = function() {
       if (is.null(self$col_roles$C)) {
         return(invisible(self))
