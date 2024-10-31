@@ -18,7 +18,7 @@ crossfit_propensity.TransportTask <- function(task, learners, control, pb) {
 
   ans <- future::value(ans)
 
-  list(ratios = recombine(rbind_depth(ans, "prop_score"), task$folds),
+  list(probs = recombine(rbind_depth(ans, "probs"), task$folds),
        fits = lapply(ans, \(x) x[["fit"]]))
 }
 
@@ -42,6 +42,6 @@ estimate_propensity.TransportTask <- function(train, valid, learners, control, p
     control$.info
   )
 
-  list(prop_score = matrix(predict(fit, newdata = valid$data()), ncol = 1),
+  list(probs = matrix(predict(fit, newdata = valid$data()), ncol = 1),
        fit = return_full_fit(fit, control))
 }

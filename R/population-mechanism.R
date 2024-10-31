@@ -18,7 +18,7 @@ crossfit_population.TransportTask <- function(task, learners, control, pb) {
 
   ans <- future::value(ans)
 
-  list(prob = recombine(rbind_depth(ans, "prob_target"), task$folds),
+  list(probs = recombine(rbind_depth(ans, "prob"), task$folds),
        fits = lapply(ans, \(x) x[["fit"]]))
 }
 
@@ -37,11 +37,11 @@ estimate_population.TransportTask <- function(train, valid, learners, control, p
     learners,
     "binomial",
     train$select(train$col_roles$id)$data(),
-    control$.learners_trt_folds,
+    control$.learners_pop_folds,
     control$.discrete,
     control$.info
   )
 
-  list(prob_target = matrix(predict(fit, newdata = valid$data()), ncol = 1),
+  list(prob = matrix(predict(fit, newdata = valid$data()), ncol = 1),
        fit = return_full_fit(fit, control))
 }

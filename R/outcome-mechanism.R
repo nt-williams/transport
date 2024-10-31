@@ -1,0 +1,56 @@
+crossfit_outcome <- function(x, ...) {
+  UseMethod("crossfit_outcome")
+}
+
+#' @export
+crossfit_outcome.TransportTask <- function(task, learners, control, pb) {
+  ans <- vector("list", length = task$nfolds())
+
+  for (fold in seq_along(task$folds)) {
+    train <- task$training(fold)
+    valid <- task$validation(fold)
+
+    ans[[fold]] <- future::future({
+      estimate_outcome.TransportTask(train, valid, learners, control, pb)
+    },
+    seed = TRUE)
+  }
+
+  ans <- future::value(ans)
+
+  list(probs = recombine(rbind_depth(ans, "probs"), task$folds),
+       fits = lapply(ans, \(x) x[["fit"]]))
+}
+
+estimate_outcome.TransportTask <- function(train, valid, learners, control, pb) {
+  on.exit(pb())
+
+  train$reset()
+  valid$reset()
+
+  probs <- matrix(nrow = valid$nrow(), ncol = 3)
+  colnames(probs) <- c("a", "1", "0")
+
+  features <- train$features("Y")
+  target <- train$col_roles$Y
+
+  train$pop("source")$obs()$select(c(features, target))
+
+  fit <- train(
+    train$pop("source")$obs()$select(c(features, target))$data(),
+    target,
+    learners,
+    train$outcome_type,
+    train$pop("source")$obs()$select(train$col_roles$id)$data(),
+    control$.learners_trt_folds,
+    control$.discrete,
+    control$.info
+  )
+
+  probs[, "a"] <- predict(fit, valid$data())
+  probs[, "1"] <- predict(fit, valid$modify("A", 1))
+  probs[, "0"] <- predict(fit, valid$modify("A", 0))
+
+  list(probs = probs,
+       fit = return_full_fit(fit, control))
+}

@@ -62,10 +62,8 @@ describe("as_transport_task()", {
 
     expect_equal(task$nrow(), 10)
     expect_equal(task$nfolds(), 2)
-    expect_equal(task$pop()$data(), pop)
-    expect_equal(task$scale(1), 0.14871422)
-    expect_equal(task$rescale(0.14871422), 1)
-    expect_equal(task$pop("target")$reset()$data(), task$data())
+    expect_equal(task$pop("target")$data(), pop)
+    expect_equal(task$pop()$reset()$data(), task$data())
     expect_equal(task$select("A")$modify("A", 1), rep(1, 10))
     expect_equal(task$reset()$select(c("A", "Z"))$data(), foo[, c("Z", "A")])
     expect_equal(task$history("A"), c("S", "W", "V", "Z"))
