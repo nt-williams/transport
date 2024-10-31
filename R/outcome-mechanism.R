@@ -1,27 +1,3 @@
-crossfit_outcome <- function(x, ...) {
-  UseMethod("crossfit_outcome")
-}
-
-#' @export
-crossfit_outcome.TransportTask <- function(task, learners, control) {
-  ans <- vector("list", length = task$nfolds())
-
-  for (fold in seq_along(task$folds)) {
-    train <- task$training(fold)
-    valid <- task$validation(fold)
-
-    ans[[fold]] <- future::future({
-      estimate_outcome.TransportTask(train, valid, learners, control)
-    },
-    seed = TRUE)
-  }
-
-  ans <- future::value(ans)
-
-  list(pred = recombine(rbind_depth(ans, "pred"), task$folds),
-       fits = lapply(ans, \(x) x[["fit"]]))
-}
-
 estimate_outcome.TransportTask <- function(train, valid, learners, control) {
   train$reset()
   valid$reset()

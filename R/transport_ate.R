@@ -44,9 +44,9 @@ transport_ate <- function(data, trt, outcome, covar, pop,
 
   nuisance <- structure(
     list(
-      propensity = crossfit_propensity(task, learners_trt, control),
-      population = crossfit_population(task, learners_pop, control),
-      outcome = crossfit_outcome(task, learners_outcome, control)
+      propensity = crossfit(task, "propensity", learners_trt, control),
+      population = crossfit(task, "population", learners_pop, control),
+      outcome    = crossfit(task, "outcome", learners_outcome, control)
     ),
     class = "standard")
 
@@ -57,24 +57,27 @@ transport_ate <- function(data, trt, outcome, covar, pop,
 
   eif_ate <- influence_function(structure(nuisance, class = "ate"), task)
 
-  nuisance$cate <- crossfit_cate(
+  nuisance$cate <- crossfit(
     task$clone()$
       add_var(eif_ate@eif, "eif_ate"),
+    "cate",
     learners_heterogeneity,
     control
   )
 
-  nuisance$hodds <- crossfit_hodds(
+  nuisance$hodds <- crossfit(
     task$clone()$
       add_var(nuisance$cate$pred, "estimated_cate"),
+    "hodds",
     learners_heterogeneity,
     control
   )
 
-  nuisance$heterogeneity <- crossfit_heterogeneity(
+  nuisance$heterogeneity <- crossfit(
     task$clone()$
       add_var(nuisance$cate$pred, "estimated_cate")$
       add_var(nuisance$population$pred, "estimated_source_prob"),
+    "heterogeneity",
     learners_heterogeneity,
     control
   )
