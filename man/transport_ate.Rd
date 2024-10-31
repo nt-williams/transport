@@ -114,7 +114,7 @@ n <- 250
 
 tmp <- gendata(n)
 
-transport_ate(data = data,
+transport_ate(data = tmp,
               trt = "A",
               outcome = "Y",
               covar = c("W", "V", "Z"),
@@ -122,7 +122,7 @@ transport_ate(data = data,
               estimator = "standard",
               folds = 1)
 
-transport_ate(data = data,
+transport_ate(data = tmp,
               trt = "A",
               outcome = "Y",
               covar = c("W", "V", "Z"),
