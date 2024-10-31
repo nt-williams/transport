@@ -2,7 +2,7 @@
 % Please edit documentation in R/transport_control.R
 \name{transport_control}
 \alias{transport_control}
-\title{Title}
+\title{Set Estimation Parameters}
 \usage{
 transport_control(
   .learners_folds = NULL,
@@ -13,8 +13,28 @@ transport_control(
 )
 }
 \arguments{
-\item{.info}{}
+\item{.learners_folds}{[\code{integer(1)}]\cr
+The number of cross-validation folds for fitting nuisance parameters.}
+
+\item{.bound}{[\code{numeric(1)}]\cr
+Determines that maximum and minimum values binomial predictions
+will be bounded by. The default is 1e-5, bounding predictions by 1e-5 and 0.9999.}
+
+\item{.return_full_fits}{[\code{logical(1)}]\cr
+Return full 'mlr3superlearner' fits? Default is \code{FALSE}, return only 'mlr3superlearner' weights.}
+
+\item{.discrete}{[\code{logical(1)}]\cr
+Use discrete or ensemble super learner? Default is \code{FALSE}.}
+
+\item{.info}{[\code{logical(1)}]\cr
+Print super learner fitting info to the console? Default is \code{FALSE}.}
+}
+\value{
+A list with parameter values.
 }
 \description{
-Title
+Defines default parameters for estimators in the 'transport' package.
+}
+\examples{
+transport_control(.learners_folds = 10)
 }
