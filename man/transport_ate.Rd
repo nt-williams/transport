@@ -82,7 +82,9 @@ Nuisance parameters are estimated using the Super Learner algorithm.
 \details{
 \subsection{Estimators}{
 
-\emph{TODO}
+The "collaborative" estimator uses covariate dimension reduction and does not require users to have knowledge about which covariates
+are effect modifiers and which differ in distribution between the populations. The "standard"
+estimator assumes all covariates are effect modifiers and differ in distribution between the populations.
 }
 }
 \examples{
