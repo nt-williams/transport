@@ -9,13 +9,6 @@ get_outcome_type = function(data, var) {
   "binary"
 }
 
-y_bounds <- function(y, outcome_type) {
-  if (outcome_type == "binomial" || is.null(outcome_type)) {
-    return(c(0, 1))
-  }
-  c(min(y, na.rm = T), max(y, na.rm = T))
-}
-
 bound <- function(x, p = 1e-05) {
   pmax(pmin(x, 1 - p), p)
 }
@@ -36,13 +29,6 @@ summary.mlr3superlearner <- function(fit) {
   res <- x * y
   res[is.na(res)] <- 0
   res
-}
-
-progress_bar <- function(estimator, folds) {
-  switch(estimator,
-    standard = progressr::progressor(folds*3),
-    collaborative = progressr::progressor(folds*6)
-  )
 }
 
 get_item <- function(x, name) {
