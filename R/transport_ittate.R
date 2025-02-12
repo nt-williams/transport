@@ -21,11 +21,14 @@ transport_ittate <- function(data, instrument, trt, outcome, covar, pop,
     folds = folds
   )
 
-  nuisance <- list(
-    propensity = crossfit(task, "propensity", learners_trt, control),
-    population = crossfit(task, "population", learners_pop, control),
-    outcome    = crossfit(task, "outcome", learners_outcome, control),
-    ptc        = crossfit(task, "ptc", learners_ptc, control)
+  nuisance <- structure(
+    list(
+      propensity = crossfit(task, "propensity", learners_trt, control),
+      population = crossfit(task, "population", learners_pop, control),
+      outcome    = crossfit(task, "outcome", learners_outcome, control),
+      ptc        = crossfit(task, "ptc", learners_ptc, control)
+    ),
+    class = "ittate"
   )
 
   # Fluctuate D_y
@@ -44,7 +47,7 @@ transport_ittate <- function(data, instrument, trt, outcome, covar, pop,
   # Fluctuate D_z
   nuisance$iterated$pred <- fluctuate_ittate(task, "cz", nuisance)$pred
 
-  output(influence_function(structure(nuisance, class = "ittate"), task),
+  output(influence_function(nuisance, task),
          nuisance,
          call,
          "transported_ittate")

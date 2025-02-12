@@ -20,17 +20,10 @@ influence_function.standard <- function(nuisance, task) {
 
   ipw_target <- (1 - pop) / (1 - mean(pop))
   ipw_source <- pop / mean(pop)
-  ipw_a <- pop / (1 - mean(pop)) * (a / nuisance$propensity - (1 - a) / (1 - nuisance$propensity))
+  ipw_a <- pop / (1 - mean(pop)) * (a / nuisance$propensity[, "1"] - (1 - a) / (1 - nuisance$propensity[, "1"]))
   hs <- (1 - nuisance$population) / nuisance$population
 
   eic <- ipw_a * hs %*0% (y - nuisance$outcome[, "a"]) + ipw_target * (ord - lambda)
-
-  task$pop("source")
-
-  ipw <- pop / (1 - mean(pop)) * (1 / nuisance$propensity) * hs
-  d.w <- survey::svydesign(~ 1, weights = ipw[pop == 1], data = task$data(reset = FALSE))
-  f <- reformulate(task$col_roles$A, task$col_roles$Y)
-  fit <- survey::svyglm(f, design = d.w, data = task$data())
 
   ife::ife(lambda + mean(eic), eic)
 }
@@ -48,7 +41,7 @@ influence_function.ate <- function(nuisance, task) {
   # ord: outcome regression difference
   ord <- nuisance$outcome[, "1"] - nuisance$outcome[, "0"]
   # propensity score
-  pred_a <- a * nuisance$propensity + (1 - nuisance$propensity) * (1 - a)
+  pred_a <- a * nuisance$propensity[, "1"] + (1 - nuisance$propensity[, "1"]) * (1 - a)
   ipw <- (2*a - 1) / pred_a
 
   eic <- ipw %*0% (y - nuisance$outcome[, "a"]) + ord
@@ -68,7 +61,7 @@ influence_function.collaborative <- function(nuisance, task) {
   ipw_s1_marginal <- pop / (1 - mean(pop))
   ipw_s0_marginal <- (1 - pop) / (1 - mean(pop))
 
-  pred_a <- a * nuisance$propensity + (1 - nuisance$propensity) * (1 - a)
+  pred_a <- a * nuisance$propensity[, "1"] + (1 - nuisance$propensity[, "1"]) * (1 - a)
   ipw <- (2*a - 1) / pred_a
 
   h_odds <- (1 - nuisance$hodds) / nuisance$hodds
@@ -131,7 +124,3 @@ influence_function.ittate <- function(nuisance, task) {
 
   ife::ife(psi1, eif_1) - ife::ife(psi0, eif_0)
 }
-
-
-
-

@@ -83,7 +83,7 @@ transport_ate <- function(data, trt, outcome, covar, pop,
 
   if (match.arg(estimator) == "standard") {
     psi <- influence_function(nuisance, task)
-    return(output(psi, nuisance, call))
+    return(output(psi, nuisance, call, "transported_ate"))
   }
 
   eif_ate <- influence_function(structure(nuisance, class = "ate"), task)
