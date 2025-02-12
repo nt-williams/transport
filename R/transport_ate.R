@@ -56,7 +56,8 @@ transport_ate <- function(data, trt, outcome, covar, pop,
                           learners_pop = "glm",
                           learners_outcome = "glm",
                           learners_heterogeneity = "glm",
-                          folds = 1, control = transport_control()) {
+                          folds = 1,
+                          control = transport_control()) {
   call <- match.call()
 
   task <- as_transport_task(
@@ -66,6 +67,7 @@ transport_ate <- function(data, trt, outcome, covar, pop,
     W = covar,
     S = pop,
     C = obs,
+    Z = NULL,
     id = id,
     weights = weights,
     folds = folds
@@ -112,5 +114,7 @@ transport_ate <- function(data, trt, outcome, covar, pop,
   )
 
   output(influence_function(structure(nuisance, class = "collaborative"), task),
-         nuisance, call)
+         nuisance,
+         call,
+         "transported_ate")
 }

@@ -5,8 +5,8 @@ TransportTask <- R6Class("TransportTask",
     folds = NULL,
     outcome_type = NULL,
 
-    initialize = function(data, A, Y, W, S, C, id, weights, folds = 1) {
-      self$col_roles <- TransportVars$new(W, S, A, C, Y, id, weights)
+    initialize = function(data, A, Y, W, S, C, Z, id, weights, folds = 1) {
+      self$col_roles <- TransportVars$new(W, S, A, Z, C, Y, id, weights)
       self$backend <- private$as_transport_data(data)
       self$folds <- private$make_folds(folds)
 
@@ -60,7 +60,9 @@ TransportTask <- R6Class("TransportTask",
     modify = function(col, x) {
       old <- self$backend[self$active_rows, col]
       on.exit(self$backend[self$active_rows, col] <- old)
-      self$backend[self$active_rows, col] <- x
+      for (i in seq_along(col)) {
+        self$backend[self$active_rows, col[i]] <- x[i]
+      }
       self$data(reset = FALSE)
     },
 

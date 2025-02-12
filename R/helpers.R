@@ -6,7 +6,7 @@ get_outcome_type = function(data, var) {
   }
 
   assert_binary(target)
-  "binary"
+  "binomial"
 }
 
 bound <- function(x, p = 1e-05) {
@@ -34,3 +34,5 @@ summary.mlr3superlearner <- function(fit) {
 get_item <- function(x, name) {
   lapply(x, \(y) y[[name]])
 }
+
+sw <- function(x) suppressWarnings(x)

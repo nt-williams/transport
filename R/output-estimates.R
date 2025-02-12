@@ -1,4 +1,4 @@
-output <- function(psi, nuisance, call) {
+output <- function(psi, nuisance, call, class) {
   structure(
     list(
       psi = psi,
@@ -6,6 +6,6 @@ output <- function(psi, nuisance, call) {
       fits = get_item(nuisance, "fits"),
       call = call
     ),
-    class = "transported_ate"
+    class = class
   )
 }
