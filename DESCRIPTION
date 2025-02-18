@@ -27,11 +27,13 @@ Imports:
     generics,
     ife (>= 0.1.12),
     mlr3superlearner,
+    origami,
     R6
 RoxygenNote: 7.3.2
 URL: https://github.com/nt-williams/transport
 BugReports: https://github.com/nt-williams/transport/issues
 Suggests: 
+    ranger,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)

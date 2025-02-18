@@ -23,14 +23,16 @@ n <- 1000
 
 tmp <- gendata(n)
 
-transport_ittate(data = tmp,
-                 trt = "Z",
-                 instrument = "A",
-                 outcome = "Y",
-                 covar = c("W1", "W2", "W3"),
-                 pop = "S",
-                 folds = 1,
-                 learners_instrument = "glm",
-                 learners_trt = "glm",
-                 learners_pop = "glm",
-                 learners_outcome = "ranger")
+if (requireNamespace("ranger", quietly = TRUE)) {
+  transport_ittate(data = tmp,
+                   trt = "Z",
+                   instrument = "A",
+                   outcome = "Y",
+                   covar = c("W1", "W2", "W3"),
+                   pop = "S",
+                   folds = 1,
+                   learners_instrument = "glm",
+                   learners_trt = "glm",
+                   learners_pop = "glm",
+                   learners_outcome = "ranger")
+}

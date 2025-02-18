@@ -31,24 +31,26 @@ describe("ATE estimators return correct values", {
   })
 })
 
-describe("ITTATE estimator returns correct value", {
-  set.seed(123)
-  tmp <- gendata_ittate(1000)
-
-  it("transport_ittate", {
+if (requireNamespace("ranger", quietly = TRUE)) {
+  describe("ITTATE estimator returns correct value", {
     set.seed(123)
-    x <- transport_ittate(data = tmp,
-                          trt = "Z",
-                          instrument = "A",
-                          outcome = "Y",
-                          covar = c("W1", "W2", "W3"),
-                          pop = "S",
-                          folds = 1,
-                          learners_instrument = "glm",
-                          learners_trt = "glm",
-                          learners_pop = "glm",
-                          learners_outcome = "ranger")
+    tmp <- gendata_ittate(1000)
 
-    expect_equal(x$psi@x, 0.054, tolerance = 0.015)
+    it("transport_ittate", {
+      set.seed(123)
+      x <- transport_ittate(data = tmp,
+                            trt = "Z",
+                            instrument = "A",
+                            outcome = "Y",
+                            covar = c("W1", "W2", "W3"),
+                            pop = "S",
+                            folds = 1,
+                            learners_instrument = "glm",
+                            learners_trt = "glm",
+                            learners_pop = "glm",
+                            learners_outcome = "ranger")
+
+      expect_equal(x$psi@x, 0.054, tolerance = 0.015)
+    })
   })
-})
+}
