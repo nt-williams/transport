@@ -108,7 +108,7 @@ influence_function.ittate <- function(nuisance, task) {
   cZ <- (Is0 * Ia1) / (prob_a[, "0"] * marg_S0)
   cW <- Is0 / marg_S0
 
-  eif_1 <- cY*(Y - q[, "1"]) +
+  eif_1 <- cY %*0% (Y - q[, "1"]) +
     cZ*(q[, "1"] - q_iterated[, "1"]) +
     cW*(q_iterated[, "1"] - psi1)
 
@@ -118,7 +118,7 @@ influence_function.ittate <- function(nuisance, task) {
   cZ <- (Is0 * Ia0) / ((1 - prob_a[, "0"]) * marg_S0)
   cW <- Is0 / marg_S0
 
-  eif_0 <- cY*(Y - q[, "0"]) +
+  eif_0 <- cY %*0% (Y - q[, "0"]) +
     cZ*(q[, "0"] - q_iterated[, "0"]) +
     cW*(q_iterated[, "0"] - psi0)
 

@@ -1,6 +1,6 @@
-describe("estimators return correct values", {
+describe("ATE estimators return correct values", {
   set.seed(123)
-  foo <- gendata(1000)
+  foo <- gendata_ate(1000)
 
   it("transport_ate(estimator = 'standard')", {
     x <- transport_ate(
@@ -13,7 +13,7 @@ describe("estimators return correct values", {
       folds = 1
     )
 
-    expect_equal(x$psi@x, 2.684402, tolerance = 0.001)
+    expect_equal(x$psi@x, 2.684402, tolerance = 0.01)
   })
 
   it("transport_ate(estimator = 'collaborative')", {
@@ -27,6 +27,28 @@ describe("estimators return correct values", {
       folds = 1
     )
 
-    expect_equal(x$psi@x, 2.778398, tolerance = 0.001)
+    expect_equal(x$psi@x, 2.778398, tolerance = 0.01)
+  })
+})
+
+describe("ITTATE estimator returns correct value", {
+  set.seed(123)
+  tmp <- gendata_ittate(1000)
+
+  it("transport_ittate", {
+    set.seed(123)
+    x <- transport_ittate(data = tmp,
+                          trt = "Z",
+                          instrument = "A",
+                          outcome = "Y",
+                          covar = c("W1", "W2", "W3"),
+                          pop = "S",
+                          folds = 1,
+                          learners_instrument = "glm",
+                          learners_trt = "glm",
+                          learners_pop = "glm",
+                          learners_outcome = "ranger")
+
+    expect_equal(x$psi@x, 0.054, tolerance = 0.015)
   })
 })

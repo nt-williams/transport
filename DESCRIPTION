@@ -1,22 +1,35 @@
 Package: transport
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Transporting Intervention Effects from One Population to Another
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors@R: 
+    c(person(given = "Nicholas",
+             family = "Williams",
+             role = c("aut", "cre", "cph"),
+             email = "ntwilliams.personal@gmail.com", 
+             comment = c(ORCID = "0000-0002-1378-4831")), 
+      person(given = "Kara",
+             family = "Rudolph",
+             role = c("aut", "cph"),
+             email = "kr2854@cumc.columbia.edu", 
+             comment = c(ORCID = "0000-0002-9417-7960")))
+Description: Doubly-robust, non-parametric estimators for the transported average treatment effect from 
+  Rudolph, Williams, Stuart, and Diaz (2023) <doi:10.48550/arXiv.2304.00117> and the 
+  intent-to-treatment average treatment effect from Rudolph and van der Laan (2017)
+  <doi:doi.org/10.1111/rssb.12213>. Estimators are fit using cross-fitting and nuisance parameters are 
+  estimated using the Super Learner algorithm.
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Imports: 
     checkmate,
     generics,
-    ife (>= 0.1.0),
+    ife (>= 0.1.12),
     mlr3superlearner,
-    R6,
-    survey
+    R6
 RoxygenNote: 7.3.2
+URL: https://github.com/nt-williams/transport
+BugReports: https://github.com/nt-williams/transport/issues
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

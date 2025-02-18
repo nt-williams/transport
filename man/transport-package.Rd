@@ -4,8 +4,25 @@
 \name{transport-package}
 \alias{transport}
 \alias{transport-package}
-\title{transport: What the Package Does (Title Case)}
+\title{transport: Transporting Intervention Effects from One Population to Another}
 \description{
-More about what it does (maybe more than one line) Use four spaces when indenting paragraphs within the Description.
+Doubly-robust, non-parametric estimators for the transported average treatment effect from Rudolph, Williams, Stuart, and Diaz (2023) \doi{10.48550/arXiv.2304.00117} and the intent-to-treatment average treatment effect from Rudolph and van der Laan (2017) \doi{doi.org/10.1111/rssb.12213}. Estimators are fit using cross-fitting and nuisance parameters are estimated using the Super Learner algorithm.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/nt-williams/transport}
+  \item Report bugs at \url{https://github.com/nt-williams/transport/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Nicholas Williams \email{ntwilliams.personal@gmail.com} (\href{https://orcid.org/0000-0002-1378-4831}{ORCID}) [copyright holder]
+
+Authors:
+\itemize{
+  \item Kara Rudolph \email{kr2854@cumc.columbia.edu} (\href{https://orcid.org/0000-0002-9417-7960}{ORCID}) [copyright holder]
+}
+
 }
 \keyword{internal}

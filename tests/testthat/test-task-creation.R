@@ -1,6 +1,6 @@
 describe("as_transport_task()", {
   set.seed(123)
-  foo <- gendata(10)
+  foo <- gendata_ate(10)
 
   it("assertions detect errors", {
     local({
@@ -41,6 +41,7 @@ describe("as_transport_task()", {
     task <- as_transport_task(
       data = foo,
       A = "A",
+      Z = NULL,
       Y = "Y",
       W = c("W", "V", "Z"),
       S = "S",
