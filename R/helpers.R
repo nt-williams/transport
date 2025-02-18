@@ -21,8 +21,8 @@ return_full_fit <- function(fit, control) {
 }
 
 #' @export
-summary.mlr3superlearner <- function(fit) {
-  cbind(Risk = fit$risk)
+summary.mlr3superlearner <- function(object, ...) {
+  cbind(Risk = object$risk)
 }
 
 `%*0%` <- function(x, y) {

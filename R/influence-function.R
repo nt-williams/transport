@@ -3,10 +3,10 @@ influence_function <- function(x, ...) {
 }
 
 #' @export
-influence_function.standard <- function(nuisance, task) {
+influence_function.standard <- function(x, task, ...) {
   task$reset()
 
-  nuisance <- get_item(nuisance, "pred")
+  nuisance <- get_item(x, "pred")
   pop <- task$select(task$col_roles$S)$data()
   a <- task$select(task$col_roles$A)$data()
   y <- task$select(task$col_roles$Y)$data()
@@ -29,10 +29,10 @@ influence_function.standard <- function(nuisance, task) {
 }
 
 #' @export
-influence_function.ate <- function(nuisance, task) {
+influence_function.ate <- function(x, task, ...) {
   task$reset()
 
-  nuisance <- get_item(nuisance, "pred")
+  nuisance <- get_item(x, "pred")
 
   pop <- task$select(task$col_roles$S)$data()
   a <- task$select(task$col_roles$A)$data()
@@ -49,10 +49,10 @@ influence_function.ate <- function(nuisance, task) {
 }
 
 #' @export
-influence_function.collaborative <- function(nuisance, task) {
+influence_function.collaborative <- function(x, task, ...) {
   task$reset()
 
-  nuisance <- get_item(nuisance, "pred")
+  nuisance <- get_item(x, "pred")
 
   pop <- task$select(task$col_roles$S)$data()
   a <- task$select(task$col_roles$A)$data()
@@ -77,10 +77,10 @@ influence_function.collaborative <- function(nuisance, task) {
 }
 
 #' @export
-influence_function.ittate <- function(nuisance, task) {
+influence_function.ittate <- function(x, task, ...) {
   task$reset()
 
-  nuisance <- get_item(nuisance, "pred")
+  nuisance <- get_item(x, "pred")
 
   q <- nuisance$outcome
   q_iterated <- nuisance$iterated

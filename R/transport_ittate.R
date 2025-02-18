@@ -24,7 +24,6 @@
 #'  An optional column name containing cluster level identifiers.
 #' @param weights \[\code{character(1)}\]\cr
 #'  An optional column name containing sampling weights. Currently not used.
-#' @param estimator \[\code{character(1)}\]\cr
 #' @param learners_instrument \[\code{character}\]\cr
 #'  A vector of \code{mlr3superlearner} algorithms for estimation of the propensity score of the instrument.
 #' @param learners_trt \[\code{character}\]\cr

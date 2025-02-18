@@ -14,7 +14,7 @@ train <- function(data, y, learners, outcome_type, id, folds, discrete, info) {
 }
 
 #' @export
-predict.nuisance <- function(object, newdata, tol = .Machine$double.eps) {
+predict.nuisance <- function(object, newdata, tol = .Machine$double.eps, ...) {
   pred <- NextMethod("predict", newdata = newdata)
   if (object$outcome_type == "continuous") return(pred)
   bound(pred, tol)

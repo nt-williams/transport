@@ -3,12 +3,12 @@ crossfit <- function(x, ...) {
 }
 
 #' @export
-crossfit.TransportTask <- function(task, param, learners, control) {
-  ans <- vector("list", length = task$nfolds())
+crossfit.TransportTask <- function(x, param, learners, control, ...) {
+  ans <- vector("list", length = x$nfolds())
 
-  for (fold in seq_along(task$folds)) {
-    train <- task$training(fold)
-    valid <- task$validation(fold)
+  for (fold in seq_along(x$folds)) {
+    train <- x$training(fold)
+    valid <- x$validation(fold)
 
     ans[[fold]] <-
       # future::future({
@@ -20,7 +20,6 @@ crossfit.TransportTask <- function(task, param, learners, control) {
         hodds = estimate_hodds.TransportTask(train, valid, learners, control),
         heterogeneity = estimate_heterogeneity.TransportTask(train, valid, learners, control),
         ptc = estimate_ptc.TransportTask(train, valid, learners, control),
-        no_z = estimate_no_z.TransportTask(train, valid, learners, control),
         itt_iterated = estimate_itt_iterated.TransportTask(train, valid, learners, control)
       )
     # },
@@ -29,6 +28,6 @@ crossfit.TransportTask <- function(task, param, learners, control) {
 
   # ans <- future::value(ans)
 
-  list(pred = recombine(rbind_depth(ans, "pred"), task$folds),
+  list(pred = recombine(rbind_depth(ans, "pred"), x$folds),
        fits = lapply(ans, \(x) x[["fit"]]))
 }

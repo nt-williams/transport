@@ -70,8 +70,6 @@ The number of folds to be used for cross-fitting.}
 
 \item{control}{[\code{list()}]\cr
 Output of \code{transport_control()}.}
-
-\item{estimator}{[\code{character(1)}]\cr}
 }
 \value{
 An object of class \code{transported_ittate} containing the parameter estimate.
