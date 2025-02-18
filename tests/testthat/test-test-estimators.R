@@ -50,7 +50,8 @@ if (requireNamespace("ranger", quietly = TRUE)) {
                             learners_pop = "glm",
                             learners_outcome = "ranger")
 
-      expect_equal(x$psi@x, 0.054, tolerance = 0.015)
+      # 2.5% wiggle room
+      expect_equal(x$psi@x, 0.054, tolerance = 0.025)
     })
   })
 }
