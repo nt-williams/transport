@@ -34,6 +34,4 @@ BugReports: https://github.com/nt-williams/transport/issues
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-Remotes: 
-    nt-williams
 Roxygen: list(markdown = TRUE)
