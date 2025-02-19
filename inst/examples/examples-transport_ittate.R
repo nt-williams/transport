@@ -30,9 +30,5 @@ if (requireNamespace("ranger", quietly = TRUE)) {
                    outcome = "Y",
                    covar = c("W1", "W2", "W3"),
                    pop = "S",
-                   folds = 1,
-                   learners_instrument = "glm",
-                   learners_trt = "glm",
-                   learners_pop = "glm",
-                   learners_outcome = "ranger")
+                   folds = 1)
 }

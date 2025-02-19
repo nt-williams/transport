@@ -25,7 +25,7 @@ Imports:
     checkmate,
     cli,
     generics,
-    ife (>= 0.1.12),
+    ife,
     mlr3superlearner,
     origami,
     R6

@@ -29,5 +29,5 @@ crossfit.TransportTask <- function(x, param, learners, control, ...) {
   # ans <- future::value(ans)
 
   list(pred = recombine(rbind_depth(ans, "pred"), x$folds),
-       fits = lapply(ans, \(x) x[["fit"]]))
+       fits = lapply(ans, function(x) x[["fit"]]))
 }
