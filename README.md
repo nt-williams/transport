@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# transport
+# transportr
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -13,13 +13,13 @@ You can install the development version of transport from
 
 ``` r
 # install.packages("pak")
-pak::pak("nt-williams/transport")
+pak::pak("nt-williams/transportr")
 ```
 
 ## Example
 
 ``` r
-library(transport)
+library(transportr)
 
 gendata <- function(n, A = NULL) {
   W <- rbinom(n, 1, 0.5)

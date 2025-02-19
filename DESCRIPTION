@@ -1,4 +1,4 @@
-Package: transport
+Package: transportr
 Type: Package
 Title: Transporting Intervention Effects from One Population to Another
 Version: 0.1.0
@@ -30,8 +30,8 @@ Imports:
     origami,
     R6
 RoxygenNote: 7.3.2
-URL: https://github.com/nt-williams/transport
-BugReports: https://github.com/nt-williams/transport/issues
+URL: https://github.com/nt-williams/transportr
+BugReports: https://github.com/nt-williams/transportr/issues
 Suggests: 
     ranger,
     testthat (>= 3.0.0)
