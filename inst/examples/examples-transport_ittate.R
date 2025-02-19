@@ -16,8 +16,6 @@ gendata <- function(n, A = NULL, S = NULL) {
              Yi = Yi)
 }
 
-truth <- mean(gendata(1e7, 1, 0)$Yi) - mean(gendata(1e7, 0, 0)$Yi)
-
 set.seed(123)
 n <- 1000
 

@@ -97,8 +97,6 @@ gendata <- function(n, A = NULL, S = NULL) {
              Yi = Yi)
 }
 
-truth <- mean(gendata(1e7, 1, 0)$Yi) - mean(gendata(1e7, 0, 0)$Yi)
-
 set.seed(123)
 n <- 1000
 
@@ -111,10 +109,6 @@ if (requireNamespace("ranger", quietly = TRUE)) {
                    outcome = "Y",
                    covar = c("W1", "W2", "W3"),
                    pop = "S",
-                   folds = 1,
-                   learners_instrument = "glm",
-                   learners_trt = "glm",
-                   learners_pop = "glm",
-                   learners_outcome = "ranger")
+                   folds = 1)
 }
 }

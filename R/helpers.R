@@ -32,7 +32,7 @@ summary.mlr3superlearner <- function(object, ...) {
 }
 
 get_item <- function(x, name) {
-  lapply(x, \(y) y[[name]])
+  lapply(x, function(y) y[[name]])
 }
 
 sw <- function(x) suppressWarnings(x)

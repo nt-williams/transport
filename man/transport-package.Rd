@@ -6,7 +6,7 @@
 \alias{transport-package}
 \title{transport: Transporting Intervention Effects from One Population to Another}
 \description{
-Doubly-robust, non-parametric estimators for the transported average treatment effect from Rudolph, Williams, Stuart, and Diaz (2023) \doi{10.48550/arXiv.2304.00117} and the intent-to-treatment average treatment effect from Rudolph and van der Laan (2017) \doi{doi.org/10.1111/rssb.12213}. Estimators are fit using cross-fitting and nuisance parameters are estimated using the Super Learner algorithm.
+Doubly-robust, non-parametric estimators for the transported average treatment effect from Rudolph, Williams, Stuart, and Diaz (2023) \doi{10.48550/arXiv.2304.00117} and the intent-to-treatment average treatment effect from Rudolph and van der Laan (2017) \doi{10.1111/rssb.12213}. Estimators are fit using cross-fitting and nuisance parameters are estimated using the Super Learner algorithm.
 }
 \seealso{
 Useful links:
