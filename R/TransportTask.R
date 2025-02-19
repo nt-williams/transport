@@ -152,12 +152,12 @@ TransportTask <- R6Class("TransportTask",
       if (is.null(self$col_roles$id) & self$outcome_type == "binomial") {
         strata <- self$backend[[self$col_roles$Y]]
         strata[is.na(strata)] <- 2
-        folded <- origami::make_folds(self$backend, V = folds, strata_ids = strata)
+        folded <- make_folds(self$backend, V = folds, strata_ids = strata)
         return(folded)
       }
 
       if (!is.null(self$col_roles$id)) {
-        folded <- origami::make_folds(self$backend, cluster_ids = self$backend[[self$col_roles$id]], V = folds)
+        folded <- make_folds(self$backend, cluster_ids = self$backend[[self$col_roles$id]], V = folds)
         return(folded)
       }
 

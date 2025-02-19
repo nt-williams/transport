@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(transport)
+library(transportr)
 
-test_check("transport")
+test_check("transportr")
